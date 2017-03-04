@@ -82,7 +82,7 @@ public class SABPServer{
 						String httpReqDomain = getDomain(originalRequest.getUri().toString());
 						
 						if(adServers.contains(httpReqDomain)){
-							log.info("Blocking Ad from: "+httpReqDomain);
+							log.info("["+adServers.getSessionBlockedAds()+"] Blocking Ad from: "+httpReqDomain);
 							isAdRequest = true;
 						}
 

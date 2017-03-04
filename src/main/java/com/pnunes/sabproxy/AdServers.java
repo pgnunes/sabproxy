@@ -24,6 +24,7 @@ public class AdServers {
 	private Pattern domainPattern = Pattern.compile(DOMAIN_PATTERN);
 
 	private List<String> adServers = new ArrayList<String>();
+	private int sessionBlockedAds = 0;
 
 	public AdServers(){
 		adServers = new ArrayList<String>();
@@ -37,10 +38,15 @@ public class AdServers {
 		if(domain == null || domain.equals("")){
 			return false;
 		}else if(adServers.contains(domain)){
+			sessionBlockedAds++;
 			return true;
 		}
 
 		return false;
+	}
+
+	public int getSessionBlockedAds(){
+		return sessionBlockedAds;
 	}
 
 	public void loadListFromHostsFileFormat(String adServersHostFile){
