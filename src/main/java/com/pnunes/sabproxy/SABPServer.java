@@ -13,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.netty.buffer.ByteBuf;
@@ -43,7 +44,12 @@ public class SABPServer{
 		adServers.updateAdServersList();
 		adServers.loadListFromHostsFileFormat(adServers.getAdServersListFile());
 	}
-	
+
+	@RequestMapping("/")
+	public String index() {
+		return "Greetings from SABProxy!";
+	}
+
 	@Bean
 	public HttpProxyServer httpProxy(){
 		HttpProxyServer server =
