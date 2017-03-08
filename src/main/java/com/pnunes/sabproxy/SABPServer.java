@@ -1,13 +1,11 @@
 package com.pnunes.sabproxy;
 
-import java.net.ServerSocket;
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.SortedMap;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpHeaders.Values;
 import org.littleshoot.proxy.HttpFilters;
 import org.littleshoot.proxy.HttpFiltersAdapter;
 import org.littleshoot.proxy.HttpFiltersSourceAdapter;
@@ -22,12 +20,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpHeaders.Names;
-import io.netty.handler.codec.http.HttpHeaders.Values;
+import java.net.ServerSocket;
+import java.util.Date;
+import java.util.Map;
 
+import static io.netty.handler.codec.http.HttpHeaders.Names.*;
+import static io.netty.handler.codec.http.HttpHeaders.Values.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
@@ -44,7 +42,7 @@ public class SABPServer{
         SpringApplication.run(SABPServer.class, args);
         adServers = new AdServers();
         Utils.initializeUserSettings();
-        adServers.updateAdServersList();
+        adServers.updateAdServersList(false);
         adServers.loadListFromHostsFileFormat(adServers.getAdServersListFile());
     }
 
@@ -123,10 +121,23 @@ public class SABPServer{
 
                                              return response;
                                              */
-                                            HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
-                                            response.headers().set("Content-Type", "text/plain");
-                                            response.headers().set("Content-Length", 0);
-                                            response.headers().set(Names.CONNECTION, Values.CLOSE);
+
+                                            if(originalRequest.getUri().contains(":443")){
+                                                HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
+                                                response.headers().set(CONNECTION, CLOSE);
+                                                return response;
+                                            }
+
+                                            //HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
+                                            String textResponse = "SABProxy - Blocked AD";
+                                            ByteBuf buffer = Unpooled.wrappedBuffer(textResponse.getBytes());
+                                            HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
+                                            response.headers().set(CONNECTION, CLOSE);
+                                            response.headers().set(CONTENT_TYPE, "text/plain; charset=UTF-8");
+                                            response.headers().set(CONTENT_LENGTH, textResponse.getBytes().length);
+                                            //response.headers().set(CACHE_CONTROL, NO_CACHE);
+                                            response.headers().set(CACHE_CONTROL, "max-age=0");
+                                            response.headers().set(VIA, httpReqDomain);
                                             return response;
                                         }
 
