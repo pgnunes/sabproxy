@@ -17,12 +17,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AdServers {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
     public static String AD_SERVERS_FILE = "adservers.txt";
     public static int AD_SERVERS_FILE_VALID_DAYS = 1;
     private static String AD_SERVERS_SOURCE_URL = "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts";
-
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     private String DOMAIN_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{2,6}$";
     private Pattern domainPattern = Pattern.compile(DOMAIN_PATTERN);
 
@@ -122,20 +120,33 @@ public class AdServers {
             // check if its older than x days
             long timeDiff = new Date().getTime() - adServersHostFile.lastModified();
             if (timeDiff > AD_SERVERS_FILE_VALID_DAYS * 24 * 60 * 60 * 1000 || forceUpdate) { // update file only if older than AD_SERVERS_FILE_VALID_DAYS
-                try {
-                    FileUtils.copyURLToFile(new URL(AD_SERVERS_SOURCE_URL), new File(getAdServersListFile()));
-                } catch (MalformedURLException e) {
-                    log.warn("Can't update ads servers list from: " + AD_SERVERS_SOURCE_URL + ". " + e.getMessage());
-                } catch (IOException e) {
-                    log.warn("Failed to save ads servers list. " + e.getMessage());
+                if (downloadAdServersList()) {
+                    log.info("Ad servers list successfully updated.");
                 }
-                log.info("Ad servers list updated.");
             } else {
                 log.info("Ad servers list less than " + AD_SERVERS_FILE_VALID_DAYS + " day(s) old. Not updating.");
             }
+        } else {
+            if (downloadAdServersList()) {
+                log.info("Ad servers list successfully updated.");
+            }
+        }
+    }
+
+    private boolean downloadAdServersList() {
+        boolean downloadSuccess = true;
+        try {
+            FileUtils.copyURLToFile(new URL(AD_SERVERS_SOURCE_URL), new File(getAdServersListFile()));
+        } catch (MalformedURLException e) {
+            log.error("Can't update ads servers list from: " + AD_SERVERS_SOURCE_URL + ". " + e.getMessage());
+            downloadSuccess = false;
+        } catch (IOException e) {
+            log.error("Failed to save ads servers list. " + e.getMessage());
+            downloadSuccess = false;
         }
 
-
+        return downloadSuccess;
     }
+
 
 }
