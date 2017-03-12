@@ -1,7 +1,10 @@
 package com.pnunes.sabproxy;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -35,7 +38,7 @@ public class Utils {
                 ));
     }
 
-    public static String dateDifference(Date startDate, Date endDate){
+    public static String dateDifference(Date startDate, Date endDate) {
         long different = endDate.getTime() - startDate.getTime();
         long secondsInMilli = 1000;
         long minutesInMilli = secondsInMilli * 60;
@@ -53,7 +56,7 @@ public class Utils {
 
         long elapsedSeconds = different / secondsInMilli;
 
-        String dateDiff = elapsedDays+" days, "+elapsedHours+"h:"+elapsedMinutes+"m:"+elapsedSeconds+"s";
+        String dateDiff = elapsedDays + " days, " + elapsedHours + "h:" + elapsedMinutes + "m:" + elapsedSeconds + "s";
         return dateDiff;
     }
 }

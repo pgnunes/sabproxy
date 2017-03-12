@@ -1,17 +1,20 @@
 package com.pnunes.sabproxy;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.LineIterator;
 
 public class AdServers {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -28,19 +31,23 @@ public class AdServers {
     private int sessionBlockedAds = 0;
     private HitCounter hitCounter = new HitCounter();
 
-    public AdServers(){
+    public AdServers() {
         adServers = new ArrayList<String>();
+
+        Utils.initializeUserSettings();
+        updateAdServersList(false);
+        loadListFromHostsFileFormat(getAdServersListFile());
     }
 
-    public int numberOfLoadedAdServers(){
+    public int numberOfLoadedAdServers() {
         return adServers.size();
     }
 
-    public boolean contains(String domain){
+    public boolean contains(String domain) {
         sessionRequests++;
-        if(domain == null || domain.equals("")){
+        if (domain == null || domain.equals("")) {
             return false;
-        }else if(adServers.contains(domain)){
+        } else if (adServers.contains(domain)) {
             sessionBlockedAds++;
             hitCounter.addHit(domain);
             return true;
@@ -49,52 +56,52 @@ public class AdServers {
         return false;
     }
 
-    public int getSessionBlockedAds(){
+    public int getSessionBlockedAds() {
         return sessionBlockedAds;
     }
 
-    public int getSessionRequests(){
+    public int getSessionRequests() {
         return sessionRequests;
     }
 
-    public Map<String, Integer> getBlockedDomainsHits(){
+    public Map<String, Integer> getBlockedDomainsHits() {
         return hitCounter.getTopHits();
     }
 
-    public void loadListFromHostsFileFormat(String adServersHostFile){
+    public void loadListFromHostsFileFormat(String adServersHostFile) {
         adServers = new ArrayList<String>();
         LineIterator it = null;
-        log.info("Loading Ad Server list from: "+adServersHostFile);
+        log.info("Loading Ad Server list from: " + adServersHostFile);
         try {
             it = FileUtils.lineIterator(new File(adServersHostFile), "UTF-8");
 
             while (it.hasNext()) {
                 String line = it.nextLine();
 
-                if(!getAdServerFromHostsLine(line).equals("")){
+                if (!getAdServerFromHostsLine(line).equals("")) {
                     adServers.add(getAdServerFromHostsLine(line));
                 }
             }
-            log.info("Loaded "+adServers.size()+" ad servers.");
-        }catch(Exception e){
-            log.error("Failed to load ad servers from file "+adServersHostFile+". "+e.getMessage());
-        }finally {
+            log.info("Loaded " + adServers.size() + " ad servers.");
+        } catch (Exception e) {
+            log.error("Failed to load ad servers from file " + adServersHostFile + ". " + e.getMessage());
+        } finally {
             LineIterator.closeQuietly(it);
         }
     }
 
 
-    private String getAdServerFromHostsLine(String line){
-        if(line.startsWith("#") || line.isEmpty()){
+    private String getAdServerFromHostsLine(String line) {
+        if (line.startsWith("#") || line.isEmpty()) {
             return "";
         }
 
         // remove IPV4 from string
         String noIPLine = line.replaceAll("(\\d+.){3}\\d+", "").trim();
 
-        if(domainPattern.matcher(noIPLine).find()){
+        if (domainPattern.matcher(noIPLine).find()) {
             Matcher matcher = domainPattern.matcher(noIPLine);
-            while(matcher.find()) {
+            while (matcher.find()) {
                 return matcher.group();
             }
         }
@@ -102,32 +109,31 @@ public class AdServers {
         return "";
     }
 
-    public String getAdServersListFile(){
-        return Utils.getAppSettingFolder()+"/"+AD_SERVERS_FILE;
+    public String getAdServersListFile() {
+        return Utils.getAppSettingFolder() + "/" + AD_SERVERS_FILE;
     }
 
-    public void updateAdServersList(boolean forceUpdate){
+    public void updateAdServersList(boolean forceUpdate) {
         log.info("Trying to update ad servers list...");
 
         // check if file exists
         File adServersHostFile = new File(getAdServersListFile());
-        if(adServersHostFile.exists()){
+        if (adServersHostFile.exists()) {
             // check if its older than x days
             long timeDiff = new Date().getTime() - adServersHostFile.lastModified();
             if (timeDiff > AD_SERVERS_FILE_VALID_DAYS * 24 * 60 * 60 * 1000 || forceUpdate) { // update file only if older than AD_SERVERS_FILE_VALID_DAYS
                 try {
                     FileUtils.copyURLToFile(new URL(AD_SERVERS_SOURCE_URL), new File(getAdServersListFile()));
                 } catch (MalformedURLException e) {
-                    log.warn("Can't update ads servers list from: "+AD_SERVERS_SOURCE_URL+". "+e.getMessage());
+                    log.warn("Can't update ads servers list from: " + AD_SERVERS_SOURCE_URL + ". " + e.getMessage());
                 } catch (IOException e) {
-                    log.warn("Failed to save ads servers list. "+e.getMessage());
+                    log.warn("Failed to save ads servers list. " + e.getMessage());
                 }
                 log.info("Ad servers list updated.");
-            }else{
-                log.info("Ad servers list less than "+AD_SERVERS_FILE_VALID_DAYS+" day(s) old. Not updating.");
+            } else {
+                log.info("Ad servers list less than " + AD_SERVERS_FILE_VALID_DAYS + " day(s) old. Not updating.");
             }
         }
-
 
 
     }

@@ -1,35 +1,32 @@
 package com.pnunes.sabproxy;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Map.*;
 
 public class HitCounter {
     ConcurrentMap<String, Integer> hitCounter = null;
 
-    public HitCounter(){
+    public HitCounter() {
         hitCounter = new ConcurrentHashMap<String, Integer>();
     }
 
-    public void addHit(String hitString){
+    public void addHit(String hitString) {
         int currHits = 0;
-        try{
+        try {
             currHits = hitCounter.get(hitString);
-        }catch(Exception e){
+        } catch (Exception e) {
         }
 
-        if(currHits == 0){
+        if (currHits == 0) {
             hitCounter.put(hitString, 1);
-        }else {
+        } else {
             hitCounter.put(hitString, currHits + 1);
         }
     }
 
-    public Map<String, Integer> getTopHits(){
+    public Map<String, Integer> getTopHits() {
         Map<String, Integer> testMap = new HashMap(hitCounter);
 
         return Utils.sortByValue(testMap);

@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
-import io.netty.handler.codec.http.HttpHeaders.Names;
-import io.netty.handler.codec.http.HttpHeaders.Values;
 import org.littleshoot.proxy.HttpFilters;
 import org.littleshoot.proxy.HttpFiltersAdapter;
 import org.littleshoot.proxy.HttpFiltersSourceAdapter;
@@ -24,26 +22,20 @@ import java.net.ServerSocket;
 import java.util.Date;
 import java.util.Map;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.*;
-import static io.netty.handler.codec.http.HttpHeaders.Values.*;
-import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
-import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
 
 @RestController
 @EnableAutoConfiguration
 @SpringBootApplication
-public class SABPServer{
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    private static AdServers adServers = null;
-    private static int PROXY_PORT = 3129;
+public class SABPServer {
+    private static AdServers adServers = new AdServers();
+    protected static int PROXY_PORT = 3129;
+    protected static String PROXY_AD_BLOCK_TEXT = "SABProxy - Blocked AD";
     private static Date startDate = new Date();
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public static void main(String[] args) {
         SpringApplication.run(SABPServer.class, args);
-        adServers = new AdServers();
-        Utils.initializeUserSettings();
-        adServers.updateAdServersList(false);
-        adServers.loadListFromHostsFileFormat(adServers.getAdServersListFile());
     }
 
     @RequestMapping("/")
@@ -52,11 +44,11 @@ public class SABPServer{
 
         String topDomainsText = "<strong>Top Ad Domains</strong><br>";
         for (Map.Entry<String, Integer> entry : topDomains.entrySet()) {
-            topDomainsText += entry.getValue()+" "+entry.getKey()+"<br>";
+            topDomainsText += entry.getValue() + " " + entry.getKey() + "<br>";
         }
 
         int trafficAdsPercentage = 0;
-        if(adServers.getSessionRequests() > 0) {
+        if (adServers.getSessionRequests() > 0) {
             trafficAdsPercentage = adServers.getSessionBlockedAds() * 100 / adServers.getSessionRequests();
         }
 
@@ -64,10 +56,10 @@ public class SABPServer{
                 "<h2>Session Stats</h2>" +
                 "<p>" +
                 "<small>" +
-                "<strong>Up Time: </strong>" +Utils.dateDifference(startDate, new Date())+"<br><br>" +
-                "<strong>Traffic ("+trafficAdsPercentage+"% Ads)</strong><br>" +
-                "Requests:&nbsp;&nbsp;&nbsp; "+adServers.getSessionRequests()+"<br>" +
-                "Blocked Ads: "+adServers.getSessionBlockedAds()+"<br>" +
+                "<strong>Up Time: </strong>" + Utils.dateDifference(startDate, new Date()) + "<br><br>" +
+                "<strong>Traffic (" + trafficAdsPercentage + "% Ads)</strong><br>" +
+                "Requests:&nbsp;&nbsp;&nbsp; " + adServers.getSessionRequests() + "<br>" +
+                "Blocked Ads: " + adServers.getSessionBlockedAds() + "<br>" +
                 "<br>" + topDomainsText +
                 "<br>" +
                 "</small>" +
@@ -75,89 +67,74 @@ public class SABPServer{
     }
 
     @Bean
-    public HttpProxyServer httpProxy(){
+    public HttpProxyServer httpProxy() {
         HttpProxyServer server =
                 DefaultHttpProxyServer.bootstrap()
                         .withPort(PROXY_PORT)
-                        .withFiltersSource(new HttpFiltersSourceAdapter() {
-                            boolean isAdRequest = false;
-
-                            public String getDomain(String url) {
-                                if(url == null || url.length() == 0)
-                                    return "";
-
-                                int doubleslash = url.indexOf("//");
-                                if(doubleslash == -1)
-                                    doubleslash = 0;
-                                else
-                                    doubleslash += 2;
-
-                                int end = url.indexOf('/', doubleslash);
-                                end = end >= 0 ? end : url.length();
-
-                                int port = url.indexOf(':', doubleslash);
-                                end = (port > 0 && port < end) ? port : end;
-
-                                return url.substring(doubleslash, end);
-                            }
-
-                            public HttpFilters filterRequest(HttpRequest originalRequest, ChannelHandlerContext ctx) {
-                                isAdRequest = false;
-                                String httpReqDomain = getDomain(originalRequest.getUri().toString());
-
-                                if(adServers.contains(httpReqDomain)){
-                                    log.info("["+adServers.getSessionBlockedAds()+"] Blocking Ad from: "+httpReqDomain);
-                                    isAdRequest = true;
-                                }
-
-                                return new HttpFiltersAdapter(originalRequest) {
-                                    @Override
-                                    public HttpResponse clientToProxyRequest(HttpObject httpObject) {
-                                        if(isAdRequest){ // close the connection
-                                            /**
-                                             ByteBuf buffer = Unpooled.wrappedBuffer("".getBytes());
-                                             HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
-                                             HttpHeaders.setHeader(response, Names.CONNECTION, Values.CLOSE);
-
-                                             return response;
-                                             */
-
-                                            if(originalRequest.getUri().contains(":443")){
-                                                HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
-                                                response.headers().set(CONNECTION, CLOSE);
-                                                return response;
-                                            }
-
-                                            //HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
-                                            String textResponse = "SABProxy - Blocked AD";
-                                            ByteBuf buffer = Unpooled.wrappedBuffer(textResponse.getBytes());
-                                            HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
-                                            response.headers().set(CONNECTION, CLOSE);
-                                            response.headers().set(CONTENT_TYPE, "text/plain; charset=UTF-8");
-                                            response.headers().set(CONTENT_LENGTH, textResponse.getBytes().length);
-                                            //response.headers().set(CACHE_CONTROL, NO_CACHE);
-                                            response.headers().set(CACHE_CONTROL, "max-age=0");
-                                            response.headers().set(VIA, httpReqDomain);
-                                            return response;
-                                        }
-
-                                        // business as usual
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public HttpObject serverToProxyResponse(HttpObject httpObject) {
-                                        return httpObject;
-                                    }
-                                };
-                            }
-                        }).withAllowLocalOnly(false)
+                        .withFiltersSource(getAdFilter()).withAllowLocalOnly(false)
                         .start();
         return server;
     }
 
 
-    public ServerSocket test(){
+    private HttpFiltersSourceAdapter getAdFilter() {
+        HttpFiltersSourceAdapter adFilter = new HttpFiltersSourceAdapter() {
+            public HttpFilters filterRequest(HttpRequest originalRequest, ChannelHandlerContext ctx) {
+                return new HttpFiltersAdapter(originalRequest) {
+                    @Override
+                    public HttpResponse clientToProxyRequest(HttpObject httpObject) {
+
+                        String httpReqDomain = getDomain(originalRequest.getUri().toString());
+                        if (adServers.contains(httpReqDomain)) {
+                            // HTTPS initiating CONNECT request (no more visibility from this point on - drop it)
+                            if (originalRequest.getMethod() == HttpMethod.CONNECT) {
+                                try {
+                                    ctx.close();
+                                } catch (Exception e) {
+                                    // Handler intentionally closed
+                                }
+                            }
+
+                            // HTTP
+                            log.info("[" + adServers.getSessionBlockedAds() + "] Blocking Ad from: " + httpReqDomain);
+                            ByteBuf buffer = Unpooled.wrappedBuffer(PROXY_AD_BLOCK_TEXT.getBytes());
+                            HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
+                            response.headers().set(CONNECTION, "close");
+
+                            return response;
+                        }
+                        return null;
+                    }
+
+                };
+            }
+
+        };
+
+        return adFilter;
+    }
+
+
+    private String getDomain(String url) {
+        if (url == null || url.length() == 0)
+            return "";
+
+        int doubleslash = url.indexOf("//");
+        if (doubleslash == -1)
+            doubleslash = 0;
+        else
+            doubleslash += 2;
+
+        int end = url.indexOf('/', doubleslash);
+        end = end >= 0 ? end : url.length();
+
+        int port = url.indexOf(':', doubleslash);
+        end = (port > 0 && port < end) ? port : end;
+
+        return url.substring(doubleslash, end);
+    }
+
+    public ServerSocket test() {
         // hardcoded just to test...
         String proxyHost = "188.92.214.253";
         String proxyPort = "8080";
@@ -176,13 +153,13 @@ public class SABPServer{
 
                     // Print a start-up message
                     log.info("Connecting to proxy " + host + ":" + remoteport);
-                    log.info("SABProxy starting on port: "+localport);
+                    log.info("SABProxy starting on port: " + localport);
                     server = new ServerSocket(localport);
                     while (true) {
                         new ThreadProxy(server.accept(), host, remoteport, adServers);
                     }
                 } catch (Exception e) {
-                    log.error("Failed to create proxy socket listener: "+e.getMessage());
+                    log.error("Failed to create proxy socket listener: " + e.getMessage());
                 }
             }
         };
