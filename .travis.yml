@@ -10,8 +10,8 @@ addons:
     token:
       secure: UkIhxCE6KG6n4QAvzkHyK8De37UTdVcVK8WaQW6dQbEY4VSJMWAPBCwrUw+b+MgmNVBLlKHhaI3KIGQrXFX13qgdBtSWEmnYnaq1gfaRkM+/hFj22Kc3M/OMNu6oH74rxs610mpiHFZb1nZVjcIF7SIYJcPmOXCxwWQiiI8xKjB1i2UyBDS1LBxWpV/AGhd+NahTFkmOVIzXsMoEOCuFgJ4LT+AJql22EkCre7uJaCF6jTmsQToHDjwl6Deu2t3rxmJOc44EC2krQvcZtU1c41RWD0KSyXmpO62wecX//IT38y7NBi4aXhanlZXlcWWpAxMgsCV8GBugzjvtuJwzHWcfoEWPJO4a4y+t03qE2i/SDq8lsH0PAVWqbqikqhGDswl75cCY88ZoF3bgX33DnY0iurGgn7QnZj7Ag5eCz0ChJim+fpKqayQYn7f4ivCJmLzmzTXe/jWQjuEEbOMS+nt3MQBLYz17Xxd4DhvHwTb7PWdB/sOWBpxXIZx2LTYtqfnn5Sn8XV2qxCu/iWgjfQuXOhbG8GbSy4WPE6DZOow/vEdPM6tfbJ+IzRgUQ/IffZSNxiu3vOs87LuZRR5W9vdiqqRvmFMBO6M1V93ewIfDlaMdM9MO90iGFBMDOipq23rpCefbNGWmT3hLNia8HQTdO36xFlDGBzUaRAW5y2U=
   branches:
-      - master
-      - develop
+    - master
+    - develop
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarQube analysis
   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
