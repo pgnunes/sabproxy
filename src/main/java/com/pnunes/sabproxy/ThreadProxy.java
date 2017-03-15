@@ -8,9 +8,9 @@ import java.net.Socket;
 
 public class ThreadProxy extends Thread {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    private Socket sClient;
     private final String SERVER_URL;
     private final int SERVER_PORT;
+    private Socket sClient;
     private AdServers adServers;
 
     ThreadProxy(Socket sClient, String ServerUrl, int ServerPort, AdServers adServers) {
