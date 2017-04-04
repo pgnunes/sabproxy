@@ -41,13 +41,13 @@ public class AdServers {
         return adServers.size();
     }
 
-    public boolean contains(String domain) {
+    public boolean contains(String host) {
         sessionRequests++;
-        if (domain == null || domain.equals("")) {
+        if (host == null || host.equals("")) {
             return false;
-        } else if (adServers.contains(domain)) {
+        } else if (adServers.contains(host)) {
             sessionBlockedAds++;
-            hitCounter.addHit(domain);
+            hitCounter.addHit(host);
             return true;
         }
 

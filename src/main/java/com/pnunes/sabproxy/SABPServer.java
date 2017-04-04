@@ -1,12 +1,5 @@
 package com.pnunes.sabproxy;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.*;
-import org.littleshoot.proxy.HttpFilters;
-import org.littleshoot.proxy.HttpFiltersAdapter;
-import org.littleshoot.proxy.HttpFiltersSourceAdapter;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.slf4j.Logger;
@@ -18,20 +11,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.ServerSocket;
 import java.util.Date;
 import java.util.Map;
-
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
-import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 @RestController
 @EnableAutoConfiguration
 @SpringBootApplication
 public class SABPServer {
     protected static int PROXY_PORT = 3129;
-    protected static String PROXY_AD_BLOCK_TEXT = "SABProxy - Blocked AD";
     private static AdServers adServers = new AdServers();
     private static Date startDate = new Date();
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -70,88 +57,51 @@ public class SABPServer {
 
     @Bean
     public HttpProxyServer httpProxy() {
+        log.info("Starting proxy on port: " + PROXY_PORT);
         HttpProxyServer server =
                 DefaultHttpProxyServer.bootstrap()
                         .withPort(PROXY_PORT)
-                        .withFiltersSource(getAdFilter()).withAllowLocalOnly(false)
+                        .withAllowLocalOnly(false)
+                        .withServerResolver(new SABProxyDNSResolver(adServers))
+                        .withName("SABProxy")
                         .start();
-        return server;
-    }
-
-
-    private HttpFiltersSourceAdapter getAdFilter() {
-        HttpFiltersSourceAdapter adFilter = new HttpFiltersSourceAdapter() {
-            public HttpFilters filterRequest(HttpRequest originalRequest, ChannelHandlerContext ctx) {
-                return new HttpFiltersAdapter(originalRequest) {
-                    @Override
-                    public HttpResponse clientToProxyRequest(HttpObject httpObject) {
-
-                        String httpReqDomain = Utils.getDomain(originalRequest.getUri().toString());
-
-                        if (adServers.contains(httpReqDomain)) {
-                            // HTTPS initiating CONNECT request (no more visibility from this point on - drop it)
-                            if (originalRequest.getMethod() == HttpMethod.CONNECT) {
-                                try {
-                                    ctx.write(new DefaultHttpResponse(HTTP_1_1, HttpResponseStatus.NOT_FOUND));
-                                    //ctx.close();
-                                } catch (Exception e) {
-                                    // Handler intentionally closed
-                                }
-                            }
-
-                            // HTTP
-                            log.info("[" + adServers.getSessionBlockedAds() + "] Blocking Ad from: " + httpReqDomain);
-                            ByteBuf buffer = Unpooled.wrappedBuffer(PROXY_AD_BLOCK_TEXT.getBytes());
-                            HttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.OK, buffer);
-                            response.headers().set(CONNECTION, "close");
-                            response.headers().set(CONTENT_LENGTH, PROXY_AD_BLOCK_TEXT.getBytes().length);
-
-                            return response;
-                        }
-                        return null;
-                    }
-
-                };
-            }
-
-        };
-
-        return adFilter;
-    }
-
-    public ServerSocket test() {
-        // hardcoded just to test...
-        String proxyHost = "188.92.214.253";
-        String proxyPort = "8080";
-        int proxyLocalPort = PROXY_PORT;
-
-        ServerSocket server = null;
-        Runnable serverTask = new Runnable() {
-            @SuppressWarnings("resource")
-            @Override
-            public void run() {
-                try {
-                    ServerSocket server = null;
-                    String host = proxyHost;
-                    int remoteport = Integer.parseInt(proxyPort);
-                    int localport = proxyLocalPort;
-
-                    // Print a start-up message
-                    log.info("Connecting to proxy " + host + ":" + remoteport);
-                    log.info("SABProxy starting on port: " + localport);
-                    server = new ServerSocket(localport);
-                    while (true) {
-                        new ThreadProxy(server.accept(), host, remoteport, adServers);
-                    }
-                } catch (Exception e) {
-                    log.error("Failed to create proxy socket listener: " + e.getMessage());
-                }
-            }
-        };
-        Thread serverThread = new Thread(serverTask);
-        serverThread.start();
 
         return server;
     }
 
+    /**
+     public ServerSocket test() {
+     // hardcoded just to test...
+     String proxyHost = "188.92.214.253";
+     String proxyPort = "8080";
+     int proxyLocalPort = PROXY_PORT;
+
+     ServerSocket server = null;
+     Runnable serverTask = new Runnable() {
+    @SuppressWarnings("resource")
+    @Override public void run() {
+    try {
+    ServerSocket server = null;
+    String host = proxyHost;
+    int remoteport = Integer.parseInt(proxyPort);
+    int localport = proxyLocalPort;
+
+    // Print a start-up message
+    log.info("Connecting to proxy " + host + ":" + remoteport);
+    log.info("SABProxy starting on port: " + localport);
+    server = new ServerSocket(localport);
+    while (true) {
+    new ThreadProxy(server.accept(), host, remoteport, adServers);
+    }
+    } catch (Exception e) {
+    log.error("Failed to create proxy socket listener: " + e.getMessage());
+    }
+    }
+    };
+     Thread serverThread = new Thread(serverTask);
+     serverThread.start();
+
+     return server;
+     }
+     */
 }

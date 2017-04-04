@@ -49,8 +49,8 @@ public class SabproxyApplicationTests {
         }
         statusResponse = response.getStatusLine().getStatusCode();
 
-        assertEquals(HttpStatus.OK.value(), statusResponse);
-        assertEquals(SABPServer.PROXY_AD_BLOCK_TEXT, bodyResponse);
+        assertEquals(HttpStatus.BAD_GATEWAY.value(), statusResponse);
+        assertEquals("Bad Gateway: /", bodyResponse);
     }
 
     @Test
@@ -86,38 +86,27 @@ public class SabproxyApplicationTests {
         assertEquals(true, expectedResponse);
         assertEquals(200, statusResponse);
 
-        assertEquals(SABPServer.PROXY_AD_BLOCK_TEXT, bodyResponseSABProxied);
-        assertEquals(200, statusResponseSABProxied);
+        assertEquals("Bad Gateway: /", bodyResponseSABProxied);
+        assertEquals(502, statusResponseSABProxied);
     }
 
     @Test
     public void testHTTPSAdBlock() {
-        String bodyResponseSABProxied = "";
         int statusResponseSABProxied = 0;
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        String exceptionReason = "Remote host closed connection during handshake";
-        IOException exception = null;
 
         try {
             HttpGet httpget = new HttpGet(AD_HTTPS_URL_TEST);
             RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
             httpget.setConfig(config);
             CloseableHttpResponse responseSABProxied = httpclient.execute(httpget);
-            bodyResponseSABProxied = EntityUtils.toString(responseSABProxied.getEntity());
             statusResponseSABProxied = responseSABProxied.getStatusLine().getStatusCode();
 
         } catch (IOException e) {
             //e.printStackTrace();
-            exception = e;
         }
 
-        boolean isExpectedResponse = false;
-        if (bodyResponseSABProxied.startsWith("<!doctype html><html lang=\"en\" ng-app=\"doubleclick\"")) {
-            isExpectedResponse = true;
-        }
-
-        assertEquals(0, statusResponseSABProxied);
-        assertEquals(exceptionReason, exception.getMessage());
+        assertEquals(502, statusResponseSABProxied);
 
     }
 
