@@ -1,6 +1,6 @@
 # sabproxy [![Build Status](https://travis-ci.org/pgnunes/sabproxy.svg)](https://travis-ci.org/pgnunes/sabproxy) [![Coverage Status](https://coveralls.io/repos/github/pgnunes/sabproxy/badge.svg?branch=develop)](https://coveralls.io/github/pgnunes/sabproxy?branch=develop) 
 ## Simple Ad Blocker Proxy
-SABProxy is an adblock proxy based on DNS filtering 
+SABProxy is a DNS filtering adblocker proxy based on [LittleProxy](https://github.com/adamfisk/LittleProxy). It can run locally on your box or on a remote server (including a [RaspberryPI](https://www.raspberrypi.org/)). It only requires Java.
 
 ### Generate java jar file
 `mvn clean verify`
