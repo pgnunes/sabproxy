@@ -50,7 +50,6 @@ public class AdServers {
             hitCounter.addHit(host);
             return true;
         }
-
         return false;
     }
 
