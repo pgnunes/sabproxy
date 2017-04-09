@@ -38,8 +38,8 @@ public class SABPServer {
         String randomColorHighLight = "";
         for (Map.Entry<String, Integer> entry : topDomains.entrySet()) {
             topDomainsText += entry.getValue() + " " + entry.getKey() + "<br>";
-            topDomainsName += "\""+entry.getKey()+"\",\n";
-            topDomainsData += entry.getValue()+", ";
+            topDomainsName += "\"" + entry.getKey() + "\",\n";
+            topDomainsData += entry.getValue() + ", ";
             randomColor += "randomColorGenerator(), ";
             randomColorHighLight += "randomColorGenerator(), ";
         }
@@ -77,16 +77,16 @@ public class SABPServer {
                 "   };\n" +
                 "   var data = {\n" +
                 "       labels: [\n" +
-                            topDomainsName +
+                topDomainsName +
                 "       ],\n" +
                 "       datasets: [\n" +
-                "           {\n"+
-                "               data: ["+topDomainsData+"],\n" +
+                "           {\n" +
+                "               data: [" + topDomainsData + "],\n" +
                 "               backgroundColor: [\n" +
-                                    randomColor +
+                randomColor +
                 "               ],\n" +
                 "               hoverBackgroundColor: [\n" +
-                                    randomColorHighLight +
+                randomColorHighLight +
                 "               ]\n" +
                 "          }]\n" +
                 "   };\n" +
@@ -98,7 +98,7 @@ public class SABPServer {
                 "           display: false\n" +
                 "       },\n" +
                 "       scaleBeginAtZero: true\n" +
-	            "   }\n" +
+                "   }\n" +
                 "   var ctx = \"ads_domains\";\n" +
                 "   var adDomainsPieChart = new Chart(ctx,{\n" +
                 "       type: 'pie',\n" +

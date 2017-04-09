@@ -9,18 +9,21 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
 @AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SabproxyApplicationTests {
 
     private static String AD_HTTP_URL_TEST = "http://pubads.g.doubleclick.net";
@@ -28,8 +31,12 @@ public class SabproxyApplicationTests {
 
     private static int PROXY_PORT = SABPServer.PROXY_PORT;
     private static String PROXY_ADDRESS = "127.0.0.1";
-
     private static HttpHost proxy = new HttpHost(PROXY_ADDRESS, PROXY_PORT, "http");
+
+    private static String WEB_SERVER_STRING = "<h1>SABProxy - Simple Ad Block Proxy</h1>";
+
+    @LocalServerPort
+    int port;
 
     @Test
     public void testHTTPAdBlock() {
@@ -110,5 +117,33 @@ public class SabproxyApplicationTests {
 
     }
 
+    @Test
+    public void testSABProxyStatsPage() {
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        String bodyResponse = "";
+        int statusResponse = 0;
+
+        URI webServerURI = null;
+        try {
+            webServerURI = new URI("http", null, PROXY_ADDRESS, port, "/", "", "anchor");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        HttpGet httpget = new HttpGet(webServerURI);
+
+        CloseableHttpResponse response = null;
+
+        try {
+            response = httpclient.execute(httpget);
+            bodyResponse = EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        statusResponse = response.getStatusLine().getStatusCode();
+
+        assertEquals(HttpStatus.OK.value(), statusResponse);
+        assertEquals(true, bodyResponse.contains(WEB_SERVER_STRING));
+    }
 
 }
