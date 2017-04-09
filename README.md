@@ -2,6 +2,9 @@
 ## Simple Ad Blocker Proxy
 SABProxy is a DNS filtering adblocker proxy based on [LittleProxy](https://github.com/adamfisk/LittleProxy). It can run locally on your box or on a remote server (including a [RaspberryPI](https://www.raspberrypi.org/)). It only requires Java.
 
+### Screenshot
+![alt text]( https://github.com/pgnunes/sabproxy/raw/develop/screenshot/screenshot.png "Homepage")
+
 ### Generate java jar file
 `mvn clean verify`
 
