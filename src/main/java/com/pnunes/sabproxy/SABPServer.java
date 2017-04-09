@@ -31,9 +31,17 @@ public class SABPServer {
     public String index() {
         Map<String, Integer> topDomains = adServers.getBlockedDomainsHits();
 
-        String topDomainsText = "<strong>Top Ad Domains</strong><br>";
+        String topDomainsText = "";
+        String topDomainsName = "";
+        String topDomainsData = "";
+        String randomColor = "";
+        String randomColorHighLight = "";
         for (Map.Entry<String, Integer> entry : topDomains.entrySet()) {
             topDomainsText += entry.getValue() + " " + entry.getKey() + "<br>";
+            topDomainsName += "\""+entry.getKey()+"\",\n";
+            topDomainsData += entry.getValue()+", ";
+            randomColor += "randomColorGenerator(), ";
+            randomColorHighLight += "randomColorGenerator(), ";
         }
 
         int trafficAdsPercentage = 0;
@@ -41,18 +49,73 @@ public class SABPServer {
             trafficAdsPercentage = adServers.getSessionBlockedAds() * 100 / adServers.getSessionRequests();
         }
 
-        return "<h1>SABProxy - Simple Ad Block Proxy</h1>" +
-                "<h2>Session Stats</h2>" +
-                "<p>" +
-                "<small>" +
-                "<strong>Up Time: </strong>" + Utils.dateDifference(startDate, new Date()) + "<br><br>" +
-                "<strong>Traffic (" + trafficAdsPercentage + "% Ads)</strong><br>" +
-                "Requests:&nbsp;&nbsp;&nbsp; " + adServers.getSessionRequests() + "<br>" +
-                "Blocked Ads: " + adServers.getSessionBlockedAds() + "<br>" +
+        return "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "<title>SABProxy Stats</title>" +
+                "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>\n" +
+                "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js\"></script>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<h1>SABProxy - Simple Ad Block Proxy</h1>\n" +
+                "<h2>Session Stats</h2>\n" +
+                "<small>\n" +
+                "<strong>Up Time: </strong>" + Utils.dateDifference(startDate, new Date()) + "<br><br>\n" +
+                "<strong>Traffic (" + trafficAdsPercentage + "% Ads)</strong><br>\n" +
+                "Requests:&nbsp;&nbsp;&nbsp; " + adServers.getSessionRequests() + "<br>\n" +
+                "Blocked Ads: " + adServers.getSessionBlockedAds() + "<br>\n" +
+
+                "<br><strong>Top Ad Domains</strong><br>\n" +
+//                "<div class=\"chart\" style=\"position: relative; height: 60vh;\">\n" +
+                "<div class=\"chart\" style=\"float:left\">\n" +
+                "   <canvas id=\"ads_domains\"></canvas>\n" +
+                "</div>\n" +
+
+                "<script>\n" +
+                "   var randomColorGenerator = function () {\n" +
+                "       return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);\n" +
+                "   };\n" +
+                "   var data = {\n" +
+                "       labels: [\n" +
+                            topDomainsName +
+                "       ],\n" +
+                "       datasets: [\n" +
+                "           {\n"+
+                "               data: ["+topDomainsData+"],\n" +
+                "               backgroundColor: [\n" +
+                                    randomColor +
+                "               ],\n" +
+                "               hoverBackgroundColor: [\n" +
+                                    randomColorHighLight +
+                "               ]\n" +
+                "          }]\n" +
+                "   };\n" +
+
+                "   var options = {\n" +
+                "       responsive: true,\n" +
+                "       maintainAspectRatio: false,\n" +
+                "       legend: {\n" +
+                "           display: false\n" +
+                "       },\n" +
+                "       scaleBeginAtZero: true\n" +
+	            "   }\n" +
+                "   var ctx = \"ads_domains\";\n" +
+                "   var adDomainsPieChart = new Chart(ctx,{\n" +
+                "       type: 'pie',\n" +
+                "       data: data,\n" +
+                "       options: options\n" +
+                "   });\n" +
+                "   document.getElementById(\"ads_domains\").style.height = '200px';\n" +
+
+                "</script>\n" +
+
+                "<br>\n" +
+                "<div style=\"float: left; clear:left\">\n" +
                 "<br>" + topDomainsText +
-                "<br>" +
-                "</small>" +
-                "</p>";
+                "</div>" +
+                "</small>\n" +
+                "</body>\n" +
+                "</html>";
     }
 
     @Bean
