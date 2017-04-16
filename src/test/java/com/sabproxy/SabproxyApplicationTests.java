@@ -1,4 +1,4 @@
-package com.pnunes.sabproxy;
+package com.sabproxy;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
