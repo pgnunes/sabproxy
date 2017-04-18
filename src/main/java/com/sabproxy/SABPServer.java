@@ -132,39 +132,4 @@ public class SABPServer {
         return server;
     }
 
-    /**
-     public ServerSocket test() {
-     // hardcoded just to test...
-     String proxyHost = "188.92.214.253";
-     String proxyPort = "8080";
-     int proxyLocalPort = PROXY_PORT;
-
-     ServerSocket server = null;
-     Runnable serverTask = new Runnable() {
-    @SuppressWarnings("resource")
-    @Override public void run() {
-    try {
-    ServerSocket server = null;
-    String host = proxyHost;
-    int remoteport = Integer.parseInt(proxyPort);
-    int localport = proxyLocalPort;
-
-    // Print a start-up message
-    log.info("Connecting to proxy " + host + ":" + remoteport);
-    log.info("SABProxy starting on port: " + localport);
-    server = new ServerSocket(localport);
-    while (true) {
-    new ThreadProxy(server.accept(), host, remoteport, adServers);
-    }
-    } catch (Exception e) {
-    log.error("Failed to create proxy socket listener: " + e.getMessage());
-    }
-    }
-    };
-     Thread serverThread = new Thread(serverTask);
-     serverThread.start();
-
-     return server;
-     }
-     */
 }
