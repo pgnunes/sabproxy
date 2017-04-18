@@ -1,4 +1,4 @@
-package com.pnunes.sabproxy;
+package com.sabproxy;
 
 import java.io.File;
 import java.util.Collections;

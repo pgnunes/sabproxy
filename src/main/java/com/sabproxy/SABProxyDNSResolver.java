@@ -1,4 +1,4 @@
-package com.pnunes.sabproxy;
+package com.sabproxy;
 
 import org.littleshoot.proxy.HostResolver;
 import org.slf4j.Logger;

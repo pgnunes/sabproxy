@@ -1,4 +1,4 @@
-package com.pnunes.sabproxy;
+package com.sabproxy;
 
 import java.util.HashMap;
 import java.util.Map;
