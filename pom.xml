@@ -5,11 +5,16 @@
 
     <groupId>com.sabproxy</groupId>
     <artifactId>sabproxy</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>sabproxy</name>
+    <name>SABProxy</name>
     <description>Simple Ad Blocker Proxy</description>
+    <url>http://sabproxy.com</url>
+    <organization>
+        <name>SABProxy</name>
+        <url>http://sabproxy.com</url>
+    </organization>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
