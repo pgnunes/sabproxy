@@ -62,6 +62,12 @@ public class AdServers {
     }
 
     public Map<String, Integer> getBlockedDomainsHits() {
+        if(hitCounter.getTopHits().isEmpty()){
+            HitCounter emptyHitCounter = new HitCounter();
+            emptyHitCounter.addHit("No data");
+            return emptyHitCounter.getTopHits();
+        }
+
         return hitCounter.getTopHits();
     }
 

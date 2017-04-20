@@ -56,8 +56,20 @@ public class Utils {
 
         long elapsedSeconds = different / secondsInMilli;
 
-        String dateDiff = elapsedDays + " day(s), " + elapsedHours + "h:" + elapsedMinutes + "m:" + elapsedSeconds + "s";
-        return dateDiff;
+        String diff = "";
+        if(elapsedDays > 0){
+            diff += elapsedDays + " day(s) ";
+        }
+        if(elapsedHours > 0){
+            diff += elapsedHours + "h:";
+        }
+        if(elapsedMinutes > 0){
+            diff += elapsedMinutes + "m:";
+        }
+
+        diff += elapsedSeconds + "s";
+
+        return diff;
     }
 
     public static String getDomain(String url) {

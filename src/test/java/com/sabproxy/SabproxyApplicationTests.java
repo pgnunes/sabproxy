@@ -33,7 +33,7 @@ public class SabproxyApplicationTests {
     private static String PROXY_ADDRESS = "127.0.0.1";
     private static HttpHost proxy = new HttpHost(PROXY_ADDRESS, PROXY_PORT, "http");
 
-    private static String WEB_SERVER_STRING = "<h1>SABProxy - Simple Ad Block Proxy</h1>";
+    private static String WEB_SERVER_STRING = "<title> SABProxy </title>";
 
     @LocalServerPort
     int port;
