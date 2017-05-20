@@ -6,8 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -15,11 +18,11 @@ import java.util.Date;
 import java.util.Map;
 
 @Controller
+@EnableAutoConfiguration
 @SpringBootApplication
 public class SABPServer {
-    protected static int PROXY_PORT = 3129;
-    private static AdServers adServers = new AdServers();
     private static Date startDate = new Date();
+    private AdServers adServers;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Value("${application.name}")
@@ -34,6 +37,13 @@ public class SABPServer {
     @Value("${application.url}")
     private String app_url = "";
 
+    @Value("${application.hosts.sources}")
+    private String[] hostsSources;
+
+    @Value("${application.port.proxy}")
+    private String app_port_proxy = "";
+
+
     @GetMapping("/")
     public String index(Map<String, Object> model) {
         Map<String, Integer> topDomains = adServers.getBlockedDomainsHits();
@@ -43,7 +53,7 @@ public class SABPServer {
         String randomColor = "";
         String randomColorHighLight = "";
         for (Map.Entry<String, Integer> entry : topDomains.entrySet()) {
-            topDomainsName += "'"+entry.getKey() + "', ";
+            topDomainsName += "'" + entry.getKey() + "', ";
             topDomainsData += entry.getValue() + ", ";
             randomColor += "randomColorGenerator(), ";
             randomColorHighLight += "randomColorGenerator(), ";
@@ -60,19 +70,19 @@ public class SABPServer {
         String currClass = "odd";
         String topDomainsTableData = "";
         for (Map.Entry<String, Integer> entry : topDomains.entrySet()) {
-            topDomainsTableData +="<tr class=\""+currClass+"\">\n";
-            topDomainsTableData +="<td>"+c+"</td>\n";
-            topDomainsTableData +="<td>"+entry.getKey()+"</td>\n";
-            topDomainsTableData +="<td class=\"center\">"+entry.getValue()+"</td>\n";
-            topDomainsTableData +="</tr>\n";
+            topDomainsTableData += "<tr class=\"" + currClass + "\">\n";
+            topDomainsTableData += "<td>" + c + "</td>\n";
+            topDomainsTableData += "<td>" + entry.getKey() + "</td>\n";
+            topDomainsTableData += "<td class=\"center\">" + entry.getValue() + "</td>\n";
+            topDomainsTableData += "</tr>\n";
 
-            if(currClass.equals("odd")){
+            if (currClass.equals("odd")) {
                 currClass = "even";
-            }else{
+            } else {
                 currClass = "odd";
             }
             c++;
-            if(c > topXsources){
+            if (c > topXsources) {
                 break;
             }
         }
@@ -96,13 +106,74 @@ public class SABPServer {
         return "index";
     }
 
+    @GetMapping("/update.html")
+    public String update(Map<String, Object> model) {
+        model.put("app_name", this.app_name);
+        model.put("application.github.user", this.github_user);
+        model.put("application.github.repo", this.github_repo);
+        model.put("application.url", this.app_url);
+
+        String app_version = this.getClass().getPackage().getImplementationVersion();
+        model.put("application.version", app_version);
+
+        String latestVersion = Utils.getLatestVersion();
+        if (latestVersion.contains("ERROR")) {
+            latestVersion = "<p class=\"text-danger\">" + latestVersion + "</p>";
+        } else {
+            latestVersion = "<p>Latest version:&nbsp;&nbsp;&nbsp; " + latestVersion + "</p>";
+            latestVersion += "<p class=\"text-info\"> <button type=\"button\" class=\"btn btn-primary\">Update Now</button> </p>";
+        }
+        model.put("application.latestVersion", latestVersion);
+
+        return "update";
+    }
+
+    @GetMapping("/sysinfo.html")
+    public String sysinfo(Map<String, Object> model) {
+        model.put("app_name", this.app_name);
+        model.put("application.github.user", this.github_user);
+        model.put("application.github.repo", this.github_repo);
+        model.put("application.url", this.app_url);
+
+        SystemInfoUtil sysinfo = new SystemInfoUtil();
+        model.put("systeminfo.os", sysinfo.getOS());
+        model.put("systeminfo.processor", sysinfo.getProcessor());
+        model.put("systeminfo.memory", sysinfo.getMemory().replace("\n", " | "));
+        model.put("systeminfo.network.interfaces", sysinfo.getNetworkInterfaces().replace("\n", "<br/>"));
+        model.put("systeminfo.network.parameters", sysinfo.getNetworkParameters().replace("\n", "<br/>"));
+        model.put("systeminfo.sensors", sysinfo.getSensorsInfo().replace("\n", "<br/>"));
+
+        return "sysinfo";
+    }
+
+    @GetMapping("/blocked-domains.html")
+    public String blockedDomainsList(Map<String, Object> model) {
+        model.put("app_name", this.app_name);
+        model.put("application.github.user", this.github_user);
+        model.put("application.github.repo", this.github_repo);
+        model.put("application.url", this.app_url);
+
+        model.put("blocked.domains.total", adServers.getNumberOfLoadedAdServers());
+        String htmlHostsSources = "";
+        String[] hostsSources = adServers.getHostsSources();
+        for (int i = 0; i < hostsSources.length; i++) {
+            htmlHostsSources += "<p><a target=\"_blank\" href=\"" + hostsSources[i] + "\"><em class=\"fa fa-external-link\"></em></a>&nbsp;" + hostsSources[i] + "</p>";
+        }
+        model.put("blocked.domains.sources", htmlHostsSources);
+        model.put("blocked.domains.sources.number", hostsSources.length);
+
+        return "blocked-domains";
+    }
 
     @Bean
     public HttpProxyServer httpProxy() {
-        log.info("Starting proxy on port: " + PROXY_PORT);
+        log.info("Starting proxy on port: " + app_port_proxy);
+
+        adServers = new AdServers(hostsSources);
+
         HttpProxyServer server =
                 DefaultHttpProxyServer.bootstrap()
-                        .withPort(PROXY_PORT)
+                        .withPort(Integer.valueOf(app_port_proxy))
                         .withAllowLocalOnly(false)
                         .withServerResolver(new SABProxyDNSResolver(adServers))
                         .withName("SABProxy")

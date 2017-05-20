@@ -20,8 +20,11 @@ public class SABProxyDNSResolver implements HostResolver {
     public InetSocketAddress resolve(String host, int port) throws UnknownHostException {
         if (adServers.contains(host)) {
             log.info("[" + adServers.getSessionBlockedAds() + "] Blocked Ad request from: " + host);
-            InetAddress serverInetAddr = InetAddress.getByName("127.0.0.1");
-            return new InetSocketAddress(serverInetAddr, 0);
+
+            // InetAddress serverInetAddr = InetAddress.getByName("127.0.0.1");
+            // return new InetSocketAddress(serverInetAddr, 0);
+            InetAddress serverInetAddr = InetAddress.getLocalHost();
+            return new InetSocketAddress(serverInetAddr, 8080);
         }
 
         InetAddress addr = InetAddress.getByName(host);

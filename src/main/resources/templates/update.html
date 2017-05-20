@@ -116,7 +116,7 @@
                 </div>
                 <nav class="menu">
                     <ul class="nav metismenu" id="sidebar-menu">
-                        <li class="active">
+                        <li>
                             <a href="/"> <i class="fa fa-home"></i> Dashboard </a>
                         </li>
                         <!--
@@ -135,7 +135,7 @@
                         <li>
                             <a href="blocked-domains.html"> <i class="fa fa-crosshairs"></i> Blocked Domains </a>
                         </li>
-                        <li>
+                        <li class="active">
                             <a href="update.html"> <i class="fa fa-refresh"></i> Check Update </a>
                         </li>
                         <li>
@@ -276,124 +276,37 @@
             </footer>
         </aside>
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
-        <article class="content dashboard-page">
-            <section class="section">
-                <div class="row sameheight-container">
-                    <div class="col col-xs-12 col-sm-12 col-md-6 col-xl-5 stats-col">
-                        <div class="card sameheight-item stats" data-exclude="xs">
-                            <div class="card-header card-header-sm bordered">
-                                <div class="header-block">
-                                    <h3 class="title"> Stats </h3>
-                                </div>
-                            </div>
-                            <div class="row row-sm stats-container">
-                                <div class="col-xs-12 col-sm-6 stat-col">
-                                    <div class="stat-icon"><i class="fa fa-fire"></i></div>
-                                    <div class="stat">
-                                        <div class="value"> {{trafficRequests}}</div>
-                                        <div class="name"> Requests</div>
-                                    </div>
-                                    <!--
-                                    <progress class="progress stat-progress" value="75" max="100">
-                                        <div class="progress">
-                                            <span class="progress-bar" style="width: 75%;"></span>
-                                        </div>
-                                    </progress>
-                                    -->
-                                </div>
-                                <div class="col-xs-12 col-sm-6 stat-col">
-                                    <div class="stat-icon"><i class="fa fa-filter"></i></div>
-                                    <div class="stat">
-                                        <div class="value"> {{trafficAdsRequests}}</div>
-                                        <div class="name"> Blocked Ads</div>
-                                    </div>
-                                    <progress class="progress stat-progress" value="{{trafficAdsRequests}}"
-                                              max="{{trafficRequests}}">
-                                        <div class="progress">
-                                            <span class="progress-bar" style="width: 25%;"></span>
-                                        </div>
-                                    </progress>
-                                </div>
-                                <div class="col-xs-12 col-sm-6  stat-col">
-                                    <div class="stat-icon"><i class="fa fa-clock-o"></i></div>
-                                    <div class="stat">
-                                        <div class="value"> {{uptime}}</div>
-                                        <div class="name"> Uptime</div>
-                                    </div>
-                                    <!--
-                                    <progress class="progress stat-progress" value="60" max="100">
-                                        <div class="progress">
-                                            <span class="progress-bar" style="width: 60%;"></span>
-                                        </div>
-                                    </progress>
-                                    -->
-                                </div>
-                                <div class="col-xs-12 col-sm-6  stat-col">
-                                    <div class="stat-icon"><i class="fa fa-line-chart"></i></div>
-                                    <div class="stat">
-                                        <div class="value"> {{trafficAdsPercentage}} %</div>
-                                        <div class="name"> Ads Percentage</div>
-                                    </div>
-                                    <progress class="progress stat-progress" value="{{trafficAdsPercentage}}" max="100">
-                                        <div class="progress">
-                                            <span class="progress-bar" style="width: 60%;"></span>
-                                        </div>
-                                    </progress>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Stats -->
-                    <div class="col col-xs-12 col-sm-12 col-md-6 col-xl-7 history-col">
-                        <div class="card sameheight-item" data-exclude="xs">
-                            <div class="card-header card-header-sm bordered">
-                                <div class="header-block">
-                                    <h3 class="title">Ad Sources </h3>
-                                </div>
-                            </div>
-                            <div class="card-block">
-                                <div class="tab-content">
-                                    <canvas id="ads_domains"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                </div>
-            </section>
+        <article class="content charts-flot-page">
+            <div class="title-block">
+                <h3 class="title"> Update </h3>
+                <p class="title-description"> Check for updates </p>
+            </div>
 
             <section class="section">
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-block">
-                                <div class="card-title-block">
-                                    <h3 class="title"> Top 20 </h3>
+                    <div class="col-xl-4">
+                        <div class="card card-info">
+                            <!-- <div class="card card-warning"> -->
+                            <div class="card-header">
+                                <div class="header-block">
+                                    <p class="title"> SABProxy Information </p>
                                 </div>
-                                <section class="example">
-                                    <div class="table-flip-scroll">
-                                        <table class="table thead-default table-striped table-bordered table-hover flip-content">
-                                            <thead class="flip-header">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Source</th>
-                                                <th>Requests</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {{{top20DomainsTableData}}}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </section>
                             </div>
+                            <div class="card-block">
+                                <p>Current version: {{{application.version}}}</p>
+                                {{{application.latestVersion}}}
+                            </div>
+                            <div class="card-footer"></div>
                         </div>
                     </div>
+                    <!-- /.col-xl-4 -->
                 </div>
+                <!-- /.row -->
             </section>
-
         </article>
+
 
         <footer class="footer">
             <div class="footer-block buttons">
@@ -499,47 +412,8 @@
 </div>
 
 <script src="js/jquery.min.js"></script>
-<script src="js/Chart.min.js"></script>
 <script src="js/vendor.js"></script>
 <script src="js/app.js"></script>
-
-// @formatter:off
-<script>
-    var randomColorGenerator = function () {
-        return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
-    };
-    var data = {
-        labels: [
-            {{{topDomainsName}}}
-        ],
-        datasets: [
-            {
-                data: [ {{topDomainsData}} ],
-                backgroundColor: [ {{randomColor}} ],
-                hoverBackgroundColor: [ {{randomColorHighLight}} ]
-            }
-        ]
-    };
-
-    var options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        legend: {
-            display: false
-        },
-        scaleBeginAtZero: true
-    }
-
-    var ctx = "ads_domains";
-
-    var adDomainsPieChart = new Chart(ctx, {
-        type: 'pie',
-        data: data,
-        options: options
-    });
-</script>
-// @formatter:on
-
 
 </body>
 

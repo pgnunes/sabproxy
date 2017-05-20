@@ -2,34 +2,35 @@ package com.sabproxy;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AdServers {
     public static String AD_SERVERS_FILE = "adservers.txt";
     public static int AD_SERVERS_FILE_VALID_DAYS = 1;
-    private static String AD_SERVERS_SOURCE_URL = "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts";
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private String DOMAIN_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{2,6}$";
     private Pattern domainPattern = Pattern.compile(DOMAIN_PATTERN);
-
-    private List<String> adServers = new ArrayList<String>();
+    private Collection<String> adServers = new HashSet<>();
     private int sessionRequests = 0;
     private int sessionBlockedAds = 0;
     private HitCounter hitCounter = new HitCounter();
+    private String[] hostsSources;
 
-    public AdServers() {
+    public AdServers(String[] hostsSources) {
+        this.hostsSources = hostsSources;
         adServers = new ArrayList<String>();
 
         Utils.initializeUserSettings();
@@ -37,7 +38,7 @@ public class AdServers {
         loadListFromHostsFileFormat(getAdServersListFile());
     }
 
-    public int numberOfLoadedAdServers() {
+    public int getNumberOfLoadedAdServers() {
         return adServers.size();
     }
 
@@ -62,7 +63,7 @@ public class AdServers {
     }
 
     public Map<String, Integer> getBlockedDomainsHits() {
-        if(hitCounter.getTopHits().isEmpty()){
+        if (hitCounter.getTopHits().isEmpty()) {
             HitCounter emptyHitCounter = new HitCounter();
             emptyHitCounter.addHit("No data");
             return emptyHitCounter.getTopHits();
@@ -139,18 +140,57 @@ public class AdServers {
     }
 
     private boolean downloadAdServersList() {
-        boolean downloadSuccess = true;
+        String property = "java.io.tmpdir";
+        String tempDir = System.getProperty(property);
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        boolean downloadSuccess = false; // will be false if only ALL downloads fail
         try {
-            FileUtils.copyURLToFile(new URL(AD_SERVERS_SOURCE_URL), new File(getAdServersListFile()));
-        } catch (MalformedURLException e) {
-            log.error("Can't update ads servers list from: " + AD_SERVERS_SOURCE_URL + ". " + e.getMessage());
-            downloadSuccess = false;
+            FileUtils.touch(new File(getAdServersListFile()));
         } catch (IOException e) {
-            log.error("Failed to save ads servers list. " + e.getMessage());
+            log.error("Failed to create ad hosts file " + getAdServersListFile() + ". " + e.getMessage());
+        }
+        // hostsSources
+        File tempDownloadFile;
+        File tempHostsFile = new File(tempDir + "/" + RandomStringUtils.random(10));
+
+        for (int i = 0; i < hostsSources.length; i++) {
+            tempDownloadFile = new File(tempDir + "/" + RandomStringUtils.random(10));
+            try {
+                HttpGet httpGet = new HttpGet(hostsSources[i]);
+                // keep sites like adaway happy as they return a 403 if no user agent
+                httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows Me; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36");
+                httpGet.addHeader("Referer", "http://sabproxy.com");
+                CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+                HttpEntity ent = httpResponse.getEntity();
+                FileUtils.copyInputStreamToFile(ent.getContent(), tempDownloadFile);
+                httpGet.releaseConnection();
+
+                downloadSuccess = true;
+                log.info("Downloaded list from: " + hostsSources[i]);
+                // merge into temp hosts file
+                FileUtils.writeByteArrayToFile(tempHostsFile, FileUtils.readFileToByteArray(tempDownloadFile), true);
+                tempDownloadFile.delete();
+            } catch (IOException e) {
+                log.error("Failed to save ads servers list from: " + hostsSources[i] + ". Reason: " + e.getMessage());
+            }
+        }
+
+        // create/update local sabproxy hosts file
+        try {
+            FileUtils.writeByteArrayToFile(new File(getAdServersListFile()), FileUtils.readFileToByteArray(tempHostsFile), false);
+        } catch (Exception e) {
+            log.error("Failed to save write ads servers list! " + e.getMessage());
             downloadSuccess = false;
+        } finally {
+            // cleanup
+            tempHostsFile.delete();
         }
 
         return downloadSuccess;
+    }
+
+    public String[] getHostsSources() {
+        return hostsSources;
     }
 
 
