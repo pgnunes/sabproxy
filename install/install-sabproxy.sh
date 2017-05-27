@@ -64,7 +64,7 @@ echo ""
 
 # Check latest version
 echo "[INFO] Check latest version..."
-wget http://sabproxy.com/release/latest.txt -O /tmp/sabproxy-latest.txt -q --show-progress
+wget http://sabproxy.com/release/latest.txt -O /tmp/sabproxy-latest.txt
 echo "[INFO] Latest version is: $(cat /tmp/sabproxy-latest.txt)"
 echo ""
 
@@ -78,7 +78,7 @@ fi
 
 # Download SABProxy
 echo "[INFO] Download SABProxy..."
-wget http://sabproxy.com/release/$(cat /tmp/sabproxy-latest.txt) -O /tmp/sabproxy.jar -q --show-progress
+wget http://sabproxy.com/release/$(cat /tmp/sabproxy-latest.txt) -O /tmp/sabproxy.jar
 cp -f /tmp/sabproxy.jar /opt/sabproxy/sabproxy.jar
 chown -R sabproxy:sabproxy /opt/sabproxy
 # double check we actually got the latest version in place...
