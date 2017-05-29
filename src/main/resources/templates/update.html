@@ -10,6 +10,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
     <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/jquery-confirm.min.css">
     <!-- Theme initialization -->
     <script>
         var themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) :
@@ -414,6 +415,59 @@
 <script src="js/jquery.min.js"></script>
 <script src="js/vendor.js"></script>
 <script src="js/app.js"></script>
+<script src="js/jquery-confirm.min.js"></script>
+
+<script>
+    $('.updatebutton').on('click', function () {
+        $.confirm({
+            title: 'Update SABProxy',
+            content: 'This will update SABProxy to the latest version. Are you sure?',
+            icon: 'fa fa-question-circle',
+            columnClass: 'medium',
+            animation: 'scale',
+            closeAnimation: 'scale',
+            opacity: 0.5,
+            buttons: {
+                'confirm': {
+                    text: 'Proceed',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        $.confirm({
+                            title: 'Important Note',
+                            content: 'If you installed SABProxy manually this may not work!<br/><br/>If it\'s running as a service (systemd) it will \
+                            automatically restart after the upgrade. If not, please restart the service manually (systemctl restart sabproxy).',
+                            icon: 'fa fa-warning',
+                            columnClass: 'medium',
+                            animation: 'zoom',
+                            closeAnimation: 'zoom',
+                            buttons: {
+                                confirm: {
+                                    text: 'Yes, sure!',
+                                    btnClass: 'btn-orange',
+                                    action: function () {
+                                        window.location = "upgrade.html";
+                                    }
+                                },
+                                cancel: function () {
+                                    //$.alert('Canceled.');
+                                },
+                                moreButtons: {
+                                    text: 'Download and update manually',
+                                    action: function () {
+                                        window.location = "http://sabproxy.com/download/";
+                                    }
+                                },
+                            }
+                        });
+                    }
+                },
+                cancel: function () {
+                    //$.alert('Canceled.');
+                },
+            }
+        });
+    });
+</script>
 
 </body>
 

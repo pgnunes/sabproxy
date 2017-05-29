@@ -1,5 +1,6 @@
 package com.sabproxy;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
@@ -111,19 +113,52 @@ public class SABPServer {
         model.put("application.github.repo", this.github_repo);
         model.put("application.url", this.app_url);
 
-        String app_version = this.getClass().getPackage().getImplementationVersion();
+        String app_version = this.getClass().getPackage().getImplementationVersion().trim();
         model.put("application.version", app_version);
 
-        String latestVersion = Utils.getLatestVersion();
+        Updater updater = new Updater();
+        String latestVersion = updater.getLatestVersion();
         if (latestVersion.contains("ERROR")) {
             latestVersion = "<p class=\"text-danger\">" + latestVersion + "</p>";
+        } else if (latestVersion.equals(app_version)) {
+            latestVersion = "<p class=\"text-info\">No updates available.</p>";
         } else {
             latestVersion = "<p>Latest version:&nbsp;&nbsp;&nbsp; " + latestVersion + "</p>";
-            latestVersion += "<p class=\"text-info\"> <button type=\"button\" class=\"btn btn-primary\">Update Now</button> </p>";
+            //latestVersion += "<p class=\"text-info\"> <button type=\"button\" class=\"btn btn-primary\">Update Now</button> </p>";
+            if (updater.upgradable()) {
+                latestVersion += "<p class=\"text-info\"> <button class=\"btn btn-primary btn-block updatebutton\">Update Now</button> </p>";
+            }
         }
         model.put("application.latestVersion", latestVersion);
 
         return "update";
+    }
+
+    @GetMapping("/upgrade.html")
+    public String upgrade(Map<String, Object> model) throws IOException {
+        Updater updater = new Updater();
+        String runningVersion = this.getClass().getPackage().getImplementationVersion().trim();
+        String latestVersion = updater.getLatestVersion();
+        if (latestVersion.contains("ERROR")) {
+            model.put("upgrade.info", "Can't upgrade!<br/>" + latestVersion);
+        } else if (latestVersion.equals(runningVersion)) {
+            model.put("upgrade.info", "Running latest version: " + latestVersion);
+        } else if (updater.upgradable()) {
+            model.put("upgrade.info", "SABProxy is upgrading and will restart automatically.<br/>This may take a while...");
+            if (!FileUtils.fileExists(Updater.tempUpgradeFlagFile) && !FileUtils.fileExists(Updater.tempUpdateFailLogFile)) {
+                Runnable upgradeSABProxy = () -> {
+                    log.info("Upgrade started. This may take a while and SABProxy will restart automatically.");
+                    updater.upgrade();
+                };
+                new Thread(upgradeSABProxy).start();
+            } else if (FileUtils.fileExists(Updater.tempUpdateFailLogFile)) {
+                model.put("upgrade.info", "Upgrade failed! <br/>Message: " + FileUtils.fileRead(Updater.tempUpdateFailLogFile));
+            } else {
+                model.put("upgrade.info", "Upgrade in progress. Please wait...");
+            }
+        }
+
+        return "upgrade";
     }
 
     @GetMapping("/sysinfo.html")

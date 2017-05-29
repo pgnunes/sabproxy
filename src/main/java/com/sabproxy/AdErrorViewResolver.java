@@ -17,8 +17,7 @@ public class AdErrorViewResolver implements ErrorViewResolver {
     public ModelAndView resolveErrorView(HttpServletRequest request, HttpStatus status, Map<String, Object> model) {
         if (HttpStatus.NOT_FOUND == status) {
             return new ModelAndView("adResponse", model, OK);
-        }
-        else {
+        } else {
             return new ModelAndView("error", model, status);
         }
     }

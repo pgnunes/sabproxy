@@ -1,19 +1,9 @@
 package com.sabproxy;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -23,11 +13,6 @@ import java.util.stream.Collectors;
 public class Utils {
     private static final Logger log = LoggerFactory.getLogger(Utils.class);
     private static String appDirName = ".sabproxy";
-    private static String currentPublicVersionURL = "http://sabproxy.com/release/latest.txt";
-    private static String sabproxyUserAgent = "SABProxy-UA/" + Utils.class.getPackage().getImplementationVersion();
-    public static String UPDATE_ERROR = "Error";
-    public static String UPDATE_NEW_VERSION = "New version available.";
-    public static String UPDATE_UPDATED = "Updated";
 
     public static void initializeUserSettings() {
         // create app folder
@@ -110,72 +95,4 @@ public class Utils {
         return url.substring(doubleslash, end);
     }
 
-    public static String getLatestVersion() {
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setUserAgent(sabproxyUserAgent)
-                .build();
-        CloseableHttpResponse response = null;
-        HttpEntity entity = null;
-        HttpGet httpGet = new HttpGet(currentPublicVersionURL);
-        String version = "";
-        try {
-            response = httpclient.execute(httpGet);
-            entity = response.getEntity();
-            version = EntityUtils.toString(response.getEntity());
-            EntityUtils.consume(entity);
-            response.close();
-        } catch (IOException e) {
-            version = "ERROR - Failed to check latest version: <br> <i>" + e.getMessage() + "</i>";
-            log.error(version);
-        }
-
-        return version;
-    }
-
-
-    public static String updateCheck(String currVersion) {
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        try {
-            HttpGet httpget = new HttpGet(currentPublicVersionURL);
-            log.info("Checking for updates...");
-
-            // Create a custom response handler
-            ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-
-                @Override
-                public String handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
-                    int status = response.getStatusLine().getStatusCode();
-                    if (status >= 200 && status < 300) {
-                        HttpEntity entity = response.getEntity();
-                        return entity != null ? EntityUtils.toString(entity) : null;
-                    } else {
-                        throw new ClientProtocolException("Unexpected response status checking for updates: " + status);
-                    }
-                }
-
-            };
-            String responseBody = null;
-
-            try {
-                responseBody = httpclient.execute(httpget, responseHandler);
-            } catch (IOException e) {
-                log.error("Failed to check for updates: " + e.getMessage());
-                return UPDATE_ERROR;
-            }
-
-            // simple string match. No proper check as it's not needed...
-            if (!responseBody.equals(currVersion)) {
-                return UPDATE_NEW_VERSION;
-            } else {
-                return UPDATE_UPDATED;
-            }
-
-        } finally {
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-                log.error("Failed to close connection checking for updates. " + e.getMessage());
-            }
-        }
-    }
 }
