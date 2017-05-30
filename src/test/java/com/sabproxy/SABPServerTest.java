@@ -9,6 +9,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,22 +25,24 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SabproxyApplicationTests {
+public class SABPServerTest {
 
     private static String AD_HTTP_URL_TEST = "http://pubads.g.doubleclick.net";
     private static String AD_HTTPS_URL_TEST = "https://pagead2.googlesyndication.com/pagead/show_companion_ad.js";
 
-    private static int PROXY_PORT = SABPServer.PROXY_PORT;
-    private static String PROXY_ADDRESS = "127.0.0.1";
-    private static HttpHost proxy = new HttpHost(PROXY_ADDRESS, PROXY_PORT, "http");
+    @Value("${application.port.proxy}")
+    private String app_port_proxy = "";
 
-    private static String WEB_SERVER_STRING = "<h1>SABProxy - Simple Ad Block Proxy</h1>";
+    private static String PROXY_ADDRESS = "127.0.0.1";
+
+    private static String WEB_SERVER_STRING = "<title> SABProxy </title>";
 
     @LocalServerPort
     int port;
 
     @Test
     public void testHTTPAdBlock() {
+        HttpHost proxy = new HttpHost(PROXY_ADDRESS, Integer.valueOf(app_port_proxy), "http");
         CloseableHttpClient httpclient = HttpClients.createDefault();
         String bodyResponse = "";
         int statusResponse = 0;
@@ -62,6 +65,7 @@ public class SabproxyApplicationTests {
 
     @Test
     public void testHTTPAdBlockProxiedVsNonProxied() {
+        HttpHost proxy = new HttpHost(PROXY_ADDRESS, Integer.valueOf(app_port_proxy), "http");
         String bodyResponse = "";
         String bodyResponseSABProxied = "";
 
@@ -99,6 +103,7 @@ public class SabproxyApplicationTests {
 
     @Test
     public void testHTTPSAdBlock() {
+        HttpHost proxy = new HttpHost(PROXY_ADDRESS, Integer.valueOf(app_port_proxy), "http");
         int statusResponseSABProxied = 0;
         CloseableHttpClient httpclient = HttpClients.createDefault();
 

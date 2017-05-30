@@ -1,5 +1,8 @@
 package com.sabproxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.Date;
@@ -8,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Utils {
+    private static final Logger log = LoggerFactory.getLogger(Utils.class);
     private static String appDirName = ".sabproxy";
 
     public static void initializeUserSettings() {
@@ -56,8 +60,20 @@ public class Utils {
 
         long elapsedSeconds = different / secondsInMilli;
 
-        String dateDiff = elapsedDays + " day(s), " + elapsedHours + "h:" + elapsedMinutes + "m:" + elapsedSeconds + "s";
-        return dateDiff;
+        String diff = "";
+        if (elapsedDays > 0) {
+            diff += elapsedDays + " day(s) ";
+        }
+        if (elapsedHours > 0) {
+            diff += elapsedHours + "h:";
+        }
+        if (elapsedMinutes > 0) {
+            diff += elapsedMinutes + "m:";
+        }
+
+        diff += elapsedSeconds + "s";
+
+        return diff;
     }
 
     public static String getDomain(String url) {
@@ -78,4 +94,5 @@ public class Utils {
 
         return url.substring(doubleslash, end);
     }
+
 }
