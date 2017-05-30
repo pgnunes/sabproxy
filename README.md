@@ -9,7 +9,7 @@ SABProxy is a DNS filtering adblocker (and track-blocker) proxy based on [Little
 `mvn clean verify`
 
 ### Start SABProxy
-`java -jar target/sabproxy-0.0.1-SNAPSHOT.jar`
+`java -jar target/sabproxy-0.0.3-SNAPSHOT.jar`
 
 ### Navigate Ad free
 Configure your browser/network proxy settings to the host where SABProxy is running like (running locally):
