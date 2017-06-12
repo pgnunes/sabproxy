@@ -81,12 +81,13 @@ echo "[INFO] Download SABProxy..."
 wget http://sabproxy.com/release/$(cat /tmp/sabproxy-latest.txt) -O /tmp/sabproxy.jar
 cp -f /tmp/sabproxy.jar /opt/sabproxy/sabproxy.jar
 chown -R sabproxy:sabproxy /opt/sabproxy
-rm -rf /tmp/sabproxy*
 # double check we actually got the latest version in place...
 if [[ $(diff -s /tmp/sabproxy.jar /opt/sabproxy/sabproxy.jar | tr ' ' '\n' | tail -1) = identical ]]
     then
         echo "[INFO] Done"
         echo ""
+        # cleanup...
+        rm -rf /tmp/sabproxy*
     else
         echo "[ERROR] Something went wrong. Please try again or install SABProxy manually."
         echo ""
