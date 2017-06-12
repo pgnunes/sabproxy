@@ -132,7 +132,7 @@ public class Updater {
 
             // replace the current executable (copyFileToDirectory will overwrite)
             log.info("Upgrading SABProxy...");
-            FileUtils.copyFileToDirectory(tempDistFile, sabproxyUserAgent);
+            FileUtils.copyFileToDirectory(tempDistFile, installationDir);
 
             // shutdown running instance - systemd will restart service using the updated version
             FileUtils.forceDelete(tempUpgradeFlagFile);
