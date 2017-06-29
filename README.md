@@ -21,7 +21,7 @@ Configure your browser/network proxy settings to the host where SABProxy is runn
 
 ### Web Interface
 Open your browser and point to the IP where SABProxy is running:
-`http://127.0.0.1:8080/`
+`http://127.0.0.1:8080/` (user: `admin`, password: `admin`)
 
 ### Help / Requests
 If you need help or want to request a new feature please [open an issue](https://github.com/pgnunes/sabproxy/issues) and it will be sorted as soon as possible.

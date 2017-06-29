@@ -108,7 +108,7 @@ $(function () {
         rules: {
             username: {
                 required: true,
-                email: true
+                email: false
             },
             password: "required",
             agree: "required"

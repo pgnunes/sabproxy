@@ -198,6 +198,12 @@ public class SABPServer {
         return "blocked-domains";
     }
 
+
+    @GetMapping("/login.html")
+    public String login(Map<String, Object> model) {
+        return "login";
+    }
+
     @Bean
     public HttpProxyServer httpProxy() {
         log.info("Starting proxy on port: " + app_port_proxy);

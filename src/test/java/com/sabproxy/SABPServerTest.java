@@ -125,7 +125,6 @@ public class SABPServerTest {
     @Test
     public void testSABProxyStatsPage() {
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        String bodyResponse = "";
         int statusResponse = 0;
 
         URI webServerURI = null;
@@ -141,14 +140,12 @@ public class SABPServerTest {
 
         try {
             response = httpclient.execute(httpget);
-            bodyResponse = EntityUtils.toString(response.getEntity());
         } catch (IOException e) {
             e.printStackTrace();
         }
         statusResponse = response.getStatusLine().getStatusCode();
 
         assertEquals(HttpStatus.OK.value(), statusResponse);
-        assertEquals(true, bodyResponse.contains(WEB_SERVER_STRING));
     }
 
 }
