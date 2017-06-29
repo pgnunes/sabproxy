@@ -1,4 +1,4 @@
-package com.sabproxy;
+package com.sabproxy.util;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
@@ -33,7 +33,6 @@ public class AdServers {
         this.hostsSources = hostsSources;
         adServers = new ArrayList<String>();
 
-        Utils.initializeUserSettings();
         updateAdServersList(false);
         loadListFromHostsFileFormat(getAdServersListFile());
     }
@@ -158,7 +157,7 @@ public class AdServers {
             try {
                 HttpGet httpGet = new HttpGet(hostsSources[i]);
                 // keep sites like adaway happy as they return a 403 if no user agent
-                httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows Me; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36");
+                httpGet.addHeader("SABPUser-Agent", "Mozilla/5.0 (Windows Me; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36");
                 httpGet.addHeader("Referer", "http://sabproxy.com");
                 CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
                 HttpEntity ent = httpResponse.getEntity();

@@ -1,5 +1,9 @@
 package com.sabproxy;
 
+import com.sabproxy.util.AdServers;
+import com.sabproxy.util.SystemInfoUtil;
+import com.sabproxy.util.Updater;
+import com.sabproxy.util.Utils;
 import org.codehaus.plexus.util.FileUtils;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
@@ -22,9 +26,8 @@ import java.util.Map;
 @SpringBootApplication
 public class SABPServer {
     private static Date startDate = new Date();
-    private AdServers adServers;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    private AdServers adServers;
     @Value("${application.name}")
     private String app_name = "";
 
@@ -43,6 +46,9 @@ public class SABPServer {
     @Value("${application.port.proxy}")
     private String app_port_proxy = "";
 
+    public static void main(String[] args) {
+        SpringApplication.run(SABPServer.class, args);
+    }
 
     @GetMapping("/")
     public String index(Map<String, Object> model) {
@@ -198,7 +204,6 @@ public class SABPServer {
         return "blocked-domains";
     }
 
-
     @GetMapping("/login.html")
     public String login(Map<String, Object> model) {
         return "login";
@@ -208,6 +213,9 @@ public class SABPServer {
     public HttpProxyServer httpProxy() {
         log.info("Starting proxy on port: " + app_port_proxy);
 
+        Utils.initializeUserSettings();
+        SABPUser sabpUser = new SABPUser();
+        sabpUser.initializeUser();
         adServers = new AdServers(hostsSources);
 
         HttpProxyServer server =
@@ -219,11 +227,6 @@ public class SABPServer {
                         .start();
 
         return server;
-    }
-
-
-    public static void main(String[] args) {
-        SpringApplication.run(SABPServer.class, args);
     }
 
 }

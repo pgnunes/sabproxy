@@ -103,7 +103,7 @@ echo "Description=SABProxy" >> $SERVICE_FILE
 echo "After=syslog.target network.target" >> $SERVICE_FILE
 echo "" >> $SERVICE_FILE
 echo "[Service]" >> $SERVICE_FILE
-echo "User=sabproxy" >> $SERVICE_FILE
+echo "SABPUser=sabproxy" >> $SERVICE_FILE
 echo "ExecStart=/usr/bin/java -jar /opt/sabproxy/sabproxy.jar" >> $SERVICE_FILE
 echo "Restart=on-failure" >> $SERVICE_FILE
 echo "SuccessExitStatus=143" >> $SERVICE_FILE
