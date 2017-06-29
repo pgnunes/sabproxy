@@ -46,8 +46,6 @@ public class SABPServer {
     @Value("${application.port.proxy}")
     private String app_port_proxy = "";
 
-    String app_version = this.getClass().getPackage().getImplementationVersion().trim();
-
     public static void main(String[] args) {
         SpringApplication.run(SABPServer.class, args);
     }
@@ -121,6 +119,7 @@ public class SABPServer {
         model.put("application.github.repo", this.github_repo);
         model.put("application.url", this.app_url);
 
+        String app_version = this.getClass().getPackage().getImplementationVersion().trim();
         model.put("application.version", app_version);
 
         Updater updater = new Updater();
@@ -207,6 +206,13 @@ public class SABPServer {
 
     @GetMapping("/login.html")
     public String login(Map<String, Object> model) {
+        String app_version = "";
+        try{
+            app_version = this.getClass().getPackage().getImplementationVersion().trim();
+        }catch(Exception e){
+            log.warn("Failed to get app version from jar...");
+            app_version = "0.0.0";
+        }
         model.put("application.version", app_version);
         return "login";
     }
