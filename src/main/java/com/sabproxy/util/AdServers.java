@@ -72,6 +72,10 @@ public class AdServers {
     }
 
     public void loadListFromHostsFileFormat(String adServersHostFile) {
+        if(adServersHostFile == null || adServersHostFile.equals("")){
+            adServersHostFile = getAdServersListFile();
+        }
+
         adServers = new ArrayList<String>();
         LineIterator it = null;
         log.info("Loading Ad Server list from: " + adServersHostFile);
@@ -138,7 +142,7 @@ public class AdServers {
         }
     }
 
-    private boolean downloadAdServersList() {
+    public boolean downloadAdServersList() {
         String property = "java.io.tmpdir";
         String tempDir = System.getProperty(property);
         CloseableHttpClient httpClient = HttpClients.createDefault();

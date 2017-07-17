@@ -26,8 +26,8 @@ import java.util.Map;
 @SpringBootApplication
 public class SABPServer {
     private static Date startDate = new Date();
+    private static AdServers adServers;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    private AdServers adServers;
     @Value("${application.name}")
     private String app_name = "";
 
@@ -48,6 +48,10 @@ public class SABPServer {
 
     public static void main(String[] args) {
         SpringApplication.run(SABPServer.class, args);
+    }
+
+    public static AdServers getAdServers(){
+        return adServers;
     }
 
     @GetMapping("/")
@@ -201,6 +205,8 @@ public class SABPServer {
         model.put("blocked.domains.sources", htmlHostsSources);
         model.put("blocked.domains.sources.number", hostsSources.length);
 
+        model.put("blocked.domains.lastupdate", "@TODO - date here!");
+
         return "blocked-domains";
     }
 
@@ -230,6 +236,7 @@ public class SABPServer {
                 DefaultHttpProxyServer.bootstrap()
                         .withPort(Integer.valueOf(app_port_proxy))
                         .withAllowLocalOnly(false)
+                        .withTransparent(true)
                         .withServerResolver(new SABProxyDNSResolver(adServers))
                         .withName("SABProxy")
                         .start();
