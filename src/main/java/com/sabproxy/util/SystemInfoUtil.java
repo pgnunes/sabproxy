@@ -1,4 +1,4 @@
-package com.sabproxy;
+package com.sabproxy.util;
 
 import org.apache.commons.io.FileUtils;
 import oshi.SystemInfo;

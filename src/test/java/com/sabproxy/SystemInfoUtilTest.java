@@ -1,5 +1,6 @@
 package com.sabproxy;
 
+import com.sabproxy.util.SystemInfoUtil;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 

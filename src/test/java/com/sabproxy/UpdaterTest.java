@@ -1,5 +1,6 @@
 package com.sabproxy;
 
+import com.sabproxy.util.Updater;
 import org.junit.Test;
 
 import java.util.regex.Matcher;
