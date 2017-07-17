@@ -10,6 +10,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
     <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/jquery-confirm.min.css">
     <!-- Theme initialization -->
     <script>
         var themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) :
@@ -140,6 +141,9 @@
                         </li>
                         <li>
                             <a href="sysinfo.html"> <i class="fa fa-info"></i> System Information </a>
+                        </li>
+                        <li>
+                            <a href="logout"> <i class="fa fa-sign-out"></i> Logout </a>
                         </li>
                         <!--
                         <li>
@@ -295,7 +299,9 @@
                                 </div>
                             </div>
                             <div class="card-block">
-                                Blocking <strong>{{{blocked.domains.total}}}</strong> ads/tracking domains.
+                                <p>Blocking <strong>{{{blocked.domains.total}}}</strong> ads/tracking domains.</p>
+                                <p>Last updated: {{{blocked.domains.lastupdate}}}</p>
+                                <p><button class="btn btn-primary updatebutton">Update</button></p>
                             </div>
                             <div class="card-footer"></div>
                         </div>
@@ -429,6 +435,22 @@
 <script src="js/jquery.min.js"></script>
 <script src="js/vendor.js"></script>
 <script src="js/app.js"></script>
+<script src="js/jquery-confirm.min.js"></script>
+
+<script>
+    $('.updatebutton').on('click', function () {
+        $.confirm({
+            title: 'Ad Servers Update',
+            icon: 'fa fa-question-circle',
+            columnClass: 'medium',
+            animation: 'scale',
+            closeAnimation: 'scale',
+            opacity: 0.5,
+            content: 'url:/adservers/update',
+        });
+    });
+</script>
+
 
 </body>
 

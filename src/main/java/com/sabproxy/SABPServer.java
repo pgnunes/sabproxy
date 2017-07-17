@@ -1,5 +1,9 @@
 package com.sabproxy;
 
+import com.sabproxy.util.AdServers;
+import com.sabproxy.util.SystemInfoUtil;
+import com.sabproxy.util.Updater;
+import com.sabproxy.util.Utils;
 import org.codehaus.plexus.util.FileUtils;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
@@ -22,9 +26,8 @@ import java.util.Map;
 @SpringBootApplication
 public class SABPServer {
     private static Date startDate = new Date();
-    private AdServers adServers;
+    private static AdServers adServers;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
     @Value("${application.name}")
     private String app_name = "";
 
@@ -43,6 +46,13 @@ public class SABPServer {
     @Value("${application.port.proxy}")
     private String app_port_proxy = "";
 
+    public static void main(String[] args) {
+        SpringApplication.run(SABPServer.class, args);
+    }
+
+    public static AdServers getAdServers(){
+        return adServers;
+    }
 
     @GetMapping("/")
     public String index(Map<String, Object> model) {
@@ -195,29 +205,43 @@ public class SABPServer {
         model.put("blocked.domains.sources", htmlHostsSources);
         model.put("blocked.domains.sources.number", hostsSources.length);
 
+        model.put("blocked.domains.lastupdate", "@TODO - date here!");
+
         return "blocked-domains";
+    }
+
+    @GetMapping("/login.html")
+    public String login(Map<String, Object> model) {
+        String app_version = "";
+        try{
+            app_version = this.getClass().getPackage().getImplementationVersion().trim();
+        }catch(Exception e){
+            log.warn("Failed to get app version from jar...");
+            app_version = "0.0.0";
+        }
+        model.put("application.version", app_version);
+        return "login";
     }
 
     @Bean
     public HttpProxyServer httpProxy() {
         log.info("Starting proxy on port: " + app_port_proxy);
 
+        Utils.initializeUserSettings();
+        SABPUser sabpUser = new SABPUser();
+        sabpUser.initializeUser();
         adServers = new AdServers(hostsSources);
 
         HttpProxyServer server =
                 DefaultHttpProxyServer.bootstrap()
                         .withPort(Integer.valueOf(app_port_proxy))
                         .withAllowLocalOnly(false)
+                        .withTransparent(true)
                         .withServerResolver(new SABProxyDNSResolver(adServers))
                         .withName("SABProxy")
                         .start();
 
         return server;
-    }
-
-
-    public static void main(String[] args) {
-        SpringApplication.run(SABPServer.class, args);
     }
 
 }
