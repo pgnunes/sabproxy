@@ -120,6 +120,14 @@ public class AdServers {
         return Utils.getAppSettingFolder() + "/" + AD_SERVERS_FILE;
     }
 
+    public String getLastUpdated(){
+        String adServersHostFile = getAdServersListFile();
+        File adServersFile = new File(adServersHostFile);
+        Date lastModified = new Date(adServersFile.lastModified());
+        return lastModified.toString();
+    }
+
+
     public void updateAdServersList(boolean forceUpdate) {
         log.info("Trying to update ad servers list...");
 
