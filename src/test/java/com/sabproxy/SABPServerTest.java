@@ -1,5 +1,6 @@
 package com.sabproxy;
 
+import com.sabproxy.security.SABPAuthenticationProvider;
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -9,11 +10,15 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -21,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
@@ -41,6 +47,9 @@ public class SABPServerTest {
 
     @LocalServerPort
     int port;
+
+    @Autowired
+    private ApplicationContext context;
 
     @Test
     public void testHTTPAdBlock() {
@@ -171,6 +180,28 @@ public class SABPServerTest {
 
         assertEquals(HttpStatus.OK.value(), statusResponse);
         assertTrue(bodyResponse.contains("sabproxy"));
+    }
+
+
+    @Test
+    public void authenticate() throws Exception {
+        SABPAuthenticationProvider authenticationManager = new SABPAuthenticationProvider();
+
+        SABPUser sabpUser = new SABPUser();
+        sabpUser.initializeUser();
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(sabpUser.getUserName(), "admin"));
+
+        assertNotNull(authentication); // UsernamePasswordAuthenticationToken if authenticated
+    }
+
+    @Test
+    public void supports() throws Exception {
+        // Using UsernamePasswordAuthenticationToken
+        SABPAuthenticationProvider authenticationManager = this.context.getBean(SABPAuthenticationProvider.class);
+
+        assertTrue(authenticationManager.supports(UsernamePasswordAuthenticationToken.class));
     }
 
 }
