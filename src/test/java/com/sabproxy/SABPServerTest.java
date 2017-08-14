@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
@@ -29,6 +30,7 @@ public class SABPServerTest {
 
     private static String AD_HTTP_URL_TEST = "http://pubads.g.doubleclick.net";
     private static String AD_HTTPS_URL_TEST = "https://pagead2.googlesyndication.com/pagead/show_companion_ad.js";
+    private static String IP_REQUEST_SABPROXY_COM = "http://72.14.188.14";
 
     @Value("${application.port.proxy}")
     private String app_port_proxy = "";
@@ -146,6 +148,29 @@ public class SABPServerTest {
         statusResponse = response.getStatusLine().getStatusCode();
 
         assertEquals(HttpStatus.OK.value(), statusResponse);
+    }
+
+    @Test
+    public void testIPHandling() {
+        HttpHost proxy = new HttpHost(PROXY_ADDRESS, Integer.valueOf(app_port_proxy), "http");
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        String bodyResponse = "";
+        int statusResponse = 0;
+
+        HttpGet httpget = new HttpGet(IP_REQUEST_SABPROXY_COM);
+        CloseableHttpResponse response = null;
+        RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+        httpget.setConfig(config);
+        try {
+            response = httpclient.execute(httpget);
+            bodyResponse = EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        statusResponse = response.getStatusLine().getStatusCode();
+
+        assertEquals(HttpStatus.OK.value(), statusResponse);
+        assertTrue(bodyResponse.contains("sabproxy"));
     }
 
 }
