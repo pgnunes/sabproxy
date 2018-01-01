@@ -10,10 +10,10 @@
 
     <name>SABProxy</name>
     <description>Simple Ad Blocker Proxy</description>
-    <url>http://sabproxy.com</url>
+    <url>http://sabproxy.tk</url>
     <organization>
         <name>SABProxy</name>
-        <url>http://sabproxy.com</url>
+        <url>http://sabproxy.tk</url>
     </organization>
 
     <parent>

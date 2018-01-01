@@ -24,7 +24,7 @@ public class Updater {
     public static String tempUpdateFailLogFile = System.getProperty("java.io.tmpdir") + "/" + "sabproxy-update.log";
     public static String tempUpgradeFlagFile = System.getProperty("java.io.tmpdir") + "/" + "sabproxy-upgrade.log";
     private final Logger log = LoggerFactory.getLogger(Updater.class);
-    private String currentPublicVersionURL = "http://sabproxy.com/release/latest.txt";
+    private String currentPublicVersionURL = "http://sabproxy.tk/release/latest.txt";
     private String installationDir = "/opt/sabproxy/";
     private String sabproxyUserAgent = "SABProxy-UA/" + Utils.class.getPackage().getImplementationVersion();
     private String sabproxyUpdaterUserAgent = "SABProxyUpdater-UA/" + Utils.class.getPackage().getImplementationVersion();

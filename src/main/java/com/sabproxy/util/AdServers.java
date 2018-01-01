@@ -170,7 +170,7 @@ public class AdServers {
                 HttpGet httpGet = new HttpGet(hostsSources[i]);
                 // keep sites like adaway happy as they return a 403 if no user agent
                 httpGet.addHeader("SABPUser-Agent", "Mozilla/5.0 (Windows Me; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36");
-                httpGet.addHeader("Referer", "http://sabproxy.com");
+                httpGet.addHeader("Referer", "http://sabproxy.tk");
                 CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
                 HttpEntity ent = httpResponse.getEntity();
                 FileUtils.copyInputStreamToFile(ent.getContent(), tempDownloadFile);
