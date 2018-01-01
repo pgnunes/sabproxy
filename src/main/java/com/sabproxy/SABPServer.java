@@ -205,7 +205,7 @@ public class SABPServer {
         model.put("blocked.domains.sources", htmlHostsSources);
         model.put("blocked.domains.sources.number", hostsSources.length);
 
-        model.put("blocked.domains.lastupdate", "@TODO - date here!");
+        model.put("blocked.domains.lastupdated", adServers.getLastUpdated());
 
         return "blocked-domains";
     }

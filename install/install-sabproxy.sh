@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# SABProxy.com
+# sabproxy.tk
 #
 # Installation script
 # - Supports installation on systemd OS's
@@ -9,7 +9,7 @@
 #   - Create directory /opt/sabproxy
 #   - Add user 'sabproxy'
 #   - Creates systemd service
-#   - Download application (jar) from sabproxy.com
+#   - Download application (jar) from sabproxy.tk
 #   - Enable and start service
 #
 
@@ -64,7 +64,7 @@ echo ""
 
 # Check latest version
 echo "[INFO] Check latest version..."
-wget http://sabproxy.com/release/latest.txt -O /tmp/sabproxy-latest.txt
+wget http://sabproxy.tk/release/latest.txt -O /tmp/sabproxy-latest.txt
 echo "[INFO] Latest version is: $(cat /tmp/sabproxy-latest.txt)"
 echo ""
 
@@ -78,7 +78,7 @@ fi
 
 # Download SABProxy
 echo "[INFO] Download SABProxy..."
-wget http://sabproxy.com/release/$(cat /tmp/sabproxy-latest.txt) -O /tmp/sabproxy.jar
+wget http://sabproxy.tk/release/$(cat /tmp/sabproxy-latest.txt) -O /tmp/sabproxy.jar
 cp -f /tmp/sabproxy.jar /opt/sabproxy/sabproxy.jar
 chown -R sabproxy:sabproxy /opt/sabproxy
 # double check we actually got the latest version in place...
@@ -153,6 +153,6 @@ echo "[INFO]   Proxy server - http://localhost:3129"
 echo "[INFO]   (replace 'localhost' with hostname or IP address when configuring your network settings)"
 echo ""
 echo "[INFO] All Done!"
-echo "[INFO] Visit http://sabproxy.com"
+echo "[INFO] Visit http://sabproxy.tk"
 echo ""
 echo ""

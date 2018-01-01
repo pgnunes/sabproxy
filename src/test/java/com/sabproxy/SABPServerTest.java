@@ -1,5 +1,6 @@
 package com.sabproxy;
 
+import com.sabproxy.security.SABPAuthenticationProvider;
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -9,11 +10,15 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -21,6 +26,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
@@ -29,6 +36,7 @@ public class SABPServerTest {
 
     private static String AD_HTTP_URL_TEST = "http://pubads.g.doubleclick.net";
     private static String AD_HTTPS_URL_TEST = "https://pagead2.googlesyndication.com/pagead/show_companion_ad.js";
+    private static String IP_REQUEST_SABPROXY_COM = "http://72.14.188.14";
 
     @Value("${application.port.proxy}")
     private String app_port_proxy = "";
@@ -39,6 +47,9 @@ public class SABPServerTest {
 
     @LocalServerPort
     int port;
+
+    @Autowired
+    private ApplicationContext context;
 
     @Test
     public void testHTTPAdBlock() {
@@ -146,6 +157,51 @@ public class SABPServerTest {
         statusResponse = response.getStatusLine().getStatusCode();
 
         assertEquals(HttpStatus.OK.value(), statusResponse);
+    }
+
+    @Test
+    public void testIPHandling() {
+        HttpHost proxy = new HttpHost(PROXY_ADDRESS, Integer.valueOf(app_port_proxy), "http");
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        String bodyResponse = "";
+        int statusResponse = 0;
+
+        HttpGet httpget = new HttpGet(IP_REQUEST_SABPROXY_COM);
+        CloseableHttpResponse response = null;
+        RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+        httpget.setConfig(config);
+        try {
+            response = httpclient.execute(httpget);
+            bodyResponse = EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        statusResponse = response.getStatusLine().getStatusCode();
+
+        assertEquals(HttpStatus.OK.value(), statusResponse);
+        assertTrue(bodyResponse.contains("sabproxy"));
+    }
+
+
+    @Test
+    public void authenticate() throws Exception {
+        SABPAuthenticationProvider authenticationManager = new SABPAuthenticationProvider();
+
+        SABPUser sabpUser = new SABPUser();
+        sabpUser.initializeUser();
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(sabpUser.getUserName(), "admin"));
+
+        assertNotNull(authentication); // UsernamePasswordAuthenticationToken if authenticated
+    }
+
+    @Test
+    public void supports() throws Exception {
+        // Using UsernamePasswordAuthenticationToken
+        SABPAuthenticationProvider authenticationManager = this.context.getBean(SABPAuthenticationProvider.class);
+
+        assertTrue(authenticationManager.supports(UsernamePasswordAuthenticationToken.class));
     }
 
 }
