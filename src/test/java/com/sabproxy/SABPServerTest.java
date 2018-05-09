@@ -36,7 +36,7 @@ public class SABPServerTest {
 
     private static String AD_HTTP_URL_TEST = "http://pubads.g.doubleclick.net";
     private static String AD_HTTPS_URL_TEST = "https://pagead2.googlesyndication.com/pagead/show_companion_ad.js";
-    private static String IP_REQUEST_SABPROXY_COM = "http://72.14.188.14";
+    private static String IR_REQUEST = "https://1.1.1.1/";
 
     @Value("${application.port.proxy}")
     private String app_port_proxy = "";
@@ -166,7 +166,7 @@ public class SABPServerTest {
         String bodyResponse = "";
         int statusResponse = 0;
 
-        HttpGet httpget = new HttpGet(IP_REQUEST_SABPROXY_COM);
+        HttpGet httpget = new HttpGet(IR_REQUEST);
         CloseableHttpResponse response = null;
         RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
         httpget.setConfig(config);
@@ -179,7 +179,7 @@ public class SABPServerTest {
         statusResponse = response.getStatusLine().getStatusCode();
 
         assertEquals(HttpStatus.OK.value(), statusResponse);
-        assertTrue(bodyResponse.contains("sabproxy"));
+        assertTrue(bodyResponse.contains("Privacy-First DNS Resolver"));
     }
 
 
