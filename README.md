@@ -9,7 +9,7 @@ SABProxy is a DNS filtering adblocker (and track-blocker) proxy based on [Little
 SABProxy can be installed on any Linux OS (running systemd) using a simple bash script:
 
 <small>1.</small>`wget https://raw.githubusercontent.com/pgnunes/sabproxy/master/install/install-sabproxy.sh`
-<br/><small>2.</small>`sudo bash install-sabproxy.sh`
+<br/><small>2.</small>`sudo -E bash install-sabproxy.sh`
 
 ### Update
 SABProxy supports auto-updating. Once started please navigate to the 'Check Update' tab and update directly from the web interface.
