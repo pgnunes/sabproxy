@@ -5,8 +5,10 @@ SABProxy is a DNS filtering adblocker (and track-blocker) proxy based on [Little
 ### Screenshot
 ![Screenshot]( https://github.com/pgnunes/sabproxy/raw/develop/screenshot/screenshot.png "Homepage")
 
-### Docker
-Run SABProxy using [Docker](https://hub.docker.com/r/pgnunes/sabproxy/ "Docker")
+### Docker 
+[![](https://images.microbadger.com/badges/image/pgnunes/sabproxy.svg)](https://microbadger.com/images/pgnunes/sabproxy "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/pgnunes/sabproxy.svg)](https://microbadger.com/images/pgnunes/sabproxy "Get your own version badge on microbadger.com")
+
+Run SABProxy using [Docker](https://hub.docker.com/r/pgnunes/sabproxy/ "Docker") 
 
 `docker run -p 8080:8080 -p 3129:3129 pgnunes/sabproxy` 
 
