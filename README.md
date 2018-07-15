@@ -3,9 +3,14 @@
 SABProxy is a DNS filtering adblocker (and track-blocker) proxy based on [LittleProxy](https://github.com/adamfisk/LittleProxy). It can run locally on your box or on a remote server (including a [RaspberryPI](https://www.raspberrypi.org/)). It only requires Java.
 
 ### Screenshot
-![alt text]( https://github.com/pgnunes/sabproxy/raw/develop/screenshot/screenshot.png "Homepage")
+![Screenshot]( https://github.com/pgnunes/sabproxy/raw/develop/screenshot/screenshot.png "Homepage")
 
-### Installation (Linux)
+### Docker
+Run SABProxy using [Docker](https://hub.docker.com/r/pgnunes/sabproxy/ "Docker")
+
+`docker run -p 8080:8080 -p 3129:3129 pgnunes/sabproxy` 
+
+### Linux Installation
 SABProxy can be installed on any Linux OS (running systemd) using a simple bash script:
 
 <small>1.</small>`wget https://raw.githubusercontent.com/pgnunes/sabproxy/master/install/install-sabproxy.sh`
