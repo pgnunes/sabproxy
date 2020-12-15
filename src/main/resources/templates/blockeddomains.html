@@ -1,10 +1,10 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="en">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title> {{app_name}} </title>
+    <title>[[${app_name}]] - Blocked Domains</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -111,107 +111,11 @@
                 <div class="sidebar-header">
                     <div class="brand">
                         <div class="logo"><span class="l l1"></span> <span class="l l2"></span> <span
-                                class="l l3"></span> <span class="l l4"></span> <span class="l l5"></span></div>
-                        {{app_name}}
+                                class="l l3"></span> <span class="l l4"></span> <span class="l l5"></span></div> [[${app_name}]]
                     </div>
                 </div>
                 <nav class="menu">
-                    <ul class="nav metismenu" id="sidebar-menu">
-                        <li>
-                            <a href="/"> <i class="fa fa-home"></i> Dashboard </a>
-                        </li>
-                        <!--
-                        <li>
-                            <a href=""> <i class="fa fa-th-large"></i> Items Manager <i class="fa arrow"></i> </a>
-                            <ul>
-                                <li><a href="items-list.html">
-                                    Items List
-                                </a></li>
-                                <li><a href="item-editor.html">
-                                    Item Editor
-                                </a></li>
-                            </ul>
-                        </li>
-                        -->
-                        <li class="active">
-                            <a href="blocked-domains.html"> <i class="fa fa-crosshairs"></i> Blocked Domains </a>
-                        </li>
-                        <li>
-                            <a href="update.html"> <i class="fa fa-refresh"></i> Check Update </a>
-                        </li>
-                        <li>
-                            <a href="sysinfo.html"> <i class="fa fa-info"></i> System Information </a>
-                        </li>
-                        <li>
-                            <a href="logout"> <i class="fa fa-sign-out"></i> Logout </a>
-                        </li>
-                        <!--
-                        <li>
-                            <a href=""> <i class="fa fa-table"></i> Tables <i class="fa arrow"></i> </a>
-                            <ul>
-                                <li><a href="static-tables.html">
-                                    Static Tables
-                                </a></li>
-                                <li><a href="responsive-tables.html">
-                                    Responsive Tables
-                                </a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="forms.html"> <i class="fa fa-pencil-square-o"></i> Forms </a>
-                        </li>
-                        <li>
-                            <a href=""> <i class="fa fa-desktop"></i> UI Elements <i class="fa arrow"></i> </a>
-                            <ul>
-                                <li><a href="buttons.html">
-                                    Buttons
-                                </a></li>
-                                <li><a href="cards.html">
-                                    Cards
-                                </a></li>
-                                <li><a href="typography.html">
-                                    Typography
-                                </a></li>
-                                <li><a href="icons.html">
-                                    Icons
-                                </a></li>
-                                <li><a href="grid.html">
-                                    Grid
-                                </a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href=""> <i class="fa fa-file-text-o"></i> Pages <i class="fa arrow"></i> </a>
-                            <ul>
-                                <li><a href="login.html">
-                                    Login
-                                </a></li>
-                                <li><a href="signup.html">
-                                    Sign Up
-                                </a></li>
-                                <li><a href="reset.html">
-                                    Reset
-                                </a></li>
-                                <li><a href="error-404.html">
-                                    Error 404 App
-                                </a></li>
-                                <li><a hr404.htmlhtml">
-                                    Error 404 Global
-                                </a></li>
-                                <li><a href="error-500.html">
-                                    Error 500 App
-                                </a></li>
-                                <li><a hr500.htmlhtml">
-                                    Error 500 Global
-                                </a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="https://github.com/modularcode/modular-admin-html"> <i
-                                    class="fa fa-github-alt"></i> Theme Docs </a>
-                        </li>
-                        -->
-                    </ul>
+                    [(${sidebar_links})]
                 </nav>
             </div>
             <footer class="sidebar-footer">
@@ -299,8 +203,8 @@
                                 </div>
                             </div>
                             <div class="card-block">
-                                <p>Blocking <strong>{{{blocked.domains.total}}}</strong> ads/tracking domains.</p>
-                                <p>Last updated: {{{blocked.domains.lastupdated}}}</p>
+                                <p>Blocking <strong>[[${blocked_domains_total}]]</strong> ads/tracking domains.</p>
+                                <p>Last updated: [[${blocked_domains_lastupdated}]]</p>
                                 <p><button class="btn btn-primary updatebutton">Update</button></p>
                             </div>
                             <div class="card-footer"></div>
@@ -312,11 +216,11 @@
                             <!-- <div class="card card-warning"> -->
                             <div class="card-header">
                                 <div class="header-block">
-                                    <p class="title"> Hosts Sources [{{{blocked.domains.sources.number}}}]</p>
+                                    <p class="title"> Hosts Sources: [[${blocked_domains_sources_number}]]</p>
                                 </div>
                             </div>
                             <div class="card-block">
-                                {{{blocked.domains.sources}}}
+                                [(${blocked_domains_sources})]
                             </div>
                             <div class="card-footer"></div>
                         </div>
@@ -330,24 +234,7 @@
 
 
         <footer class="footer">
-            <div class="footer-block buttons">
-                <iframe class="footer-github-btn"
-                        src="https://ghbtns.com/github-btn.html?user={{application.github.user}}&repo={{application.github.repo}}&type=star&count=true"
-                        frameborder="0" scrolling="0" width="140px" height="20px"></iframe>
-                <iframe class="footer-github-btn"
-                        src="https://ghbtns.com/github-btn.html?user={{application.github.user}}&repo={{application.github.repo}}&type=watch&count=true&v=2"
-                        frameborder="0" scrolling="0" width="170px" height="20px"></iframe>
-            </div>
-            <div class="footer-block author">
-                <ul>
-                    <li>
-                        <small>theme <a href="https://github.com/modularcode">ModularCode</a></small>
-                    </li>
-                    <li>
-                        <small><a href="{{application.url}}">{{app_name}}</a></small>
-                    </li>
-                </ul>
-            </div>
+            [(${footer})]
         </footer>
         <div class="modal fade" id="modal-media">
             <div class="modal-dialog modal-lg">

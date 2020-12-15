@@ -45,7 +45,7 @@ public class SystemInfoUtil {
     }
 
     public String getNetworkInterfaces() {
-        NetworkIF[] netIFS = hal.getNetworkIFs();
+        NetworkIF[] netIFS = hal.getNetworkIFs().toArray(new NetworkIF[0]);
         String netInfo = "";
         for (NetworkIF net : netIFS) {
             netInfo += "Interface: " + net.getName() + "\n";

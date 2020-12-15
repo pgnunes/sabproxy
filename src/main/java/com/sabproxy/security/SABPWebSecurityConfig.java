@@ -27,6 +27,7 @@ public class SABPWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login.html")
                 .defaultSuccessUrl("/")
+                .loginProcessingUrl("/login")
                 .failureUrl("/login.html?error=true")
                 .and()
                 .logout().logoutSuccessUrl("/login.html");
