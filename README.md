@@ -12,15 +12,6 @@ Run SABProxy using [Docker](https://hub.docker.com/r/pgnunes/sabproxy/ "Docker")
 
 `docker run -p 8080:8080 -p 3129:3129 pgnunes/sabproxy` 
 
-### Linux Installation
-SABProxy can be installed on any Linux OS (running systemd) using a simple bash script:
-
-<small>1.</small>`wget https://raw.githubusercontent.com/pgnunes/sabproxy/master/install/install-sabproxy.sh`
-<br/><small>2.</small>`sudo -E bash install-sabproxy.sh`
-
-### Update
-SABProxy supports auto-updating. Once started please navigate to the 'Check Update' tab and update directly from the web interface.
-
 ### Configuration
 Configure your browser/network proxy settings to the host where SABProxy is running like (running locally):
 - Host: `127.0.0.1`
@@ -33,3 +24,5 @@ Open your browser and point to the IP where SABProxy is running:
 ### Help / Requests
 If you need help or want to request a new feature please [open an issue](https://github.com/pgnunes/sabproxy/issues) and it will be sorted as soon as possible.
 
+#### Building Docker image locally
+`docker image build --no-cache -t pgnunes/sabproxy .` 
