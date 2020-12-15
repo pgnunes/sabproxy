@@ -1,6 +1,6 @@
 # Dockerfile for sabproxy
 
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11-jdk-slim
 VOLUME /tmp
 ARG JAR_FILE
 COPY target/sabproxy*.jar sabproxy.jar
