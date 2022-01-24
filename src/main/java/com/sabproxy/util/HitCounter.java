@@ -27,7 +27,7 @@ public class HitCounter {
     }
 
     public Map<String, Integer> getTopHits() {
-        Map<String, Integer> testMap = new HashMap(hitCounter);
+        Map<String, Integer> testMap = new HashMap<String, Integer>(hitCounter);
 
         return Utils.sortByValue(testMap);
 
