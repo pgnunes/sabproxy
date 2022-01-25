@@ -4,6 +4,7 @@ version: 2.1
 
 orbs:
   maven: circleci/maven@0.0.12
+  docker: ledger/docker@0.0.34
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
@@ -29,6 +30,10 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
+      - docker_login
+      - publish_image:
+          docker_tag: "pgnunes/sabproxy:latest"
+
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
