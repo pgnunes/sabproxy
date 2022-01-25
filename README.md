@@ -1,6 +1,6 @@
 # sabproxy [![CircleCI](https://circleci.com/gh/pgnunes/sabproxy/tree/master.svg?style=svg)](https://circleci.com/gh/pgnunes/sabproxy/tree/master)[![CircleCI](https://img.shields.io/docker/pulls/pgnunes/sabproxy?style=plastic)](https://img.shields.io/docker/pulls/pgnunes/sabproxy?style=plastic)
 ## Simple Ad Blocker Proxy
-SABProxy is a DNS filtering adblocker (and track-blocker) proxy based on [LittleProxy](https://github.com/adamfisk/LittleProxy). It can run locally on your box or on a remote server (including a [RaspberryPI](https://www.raspberrypi.org/)). It only requires Java.
+SABProxy is a DNS filtering adblocker (and track-blocker) proxy based on [LittleProxy](https://github.com/adamfisk/LittleProxy). It can run locally on your box or on a remote server (including a [RaspberryPI](https://www.raspberrypi.org/)). It only requires Java or Docker.
 
 ### Screenshot
 ![Screenshot]( https://github.com/pgnunes/sabproxy/raw/develop/screenshot/screenshot.png "Homepage")
