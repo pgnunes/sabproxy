@@ -9,6 +9,8 @@ orbs:
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
   maven:
+    docker:
+      - image: circleci/openjdk:stretch
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
