@@ -2,25 +2,44 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+orbs:
+  maven: circleci/maven@0.0.12
+  docker: ledger/docker@0.0.34
+
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+  maven:
     docker:
-      - image: cimg/base:stable
+      - image: circleci/openjdk:stretch
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }} # appends cache key with a hash of pom.xml file
+            - v1-dependencies- # fallback in case previous cache key is not found
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: "Build"
+          command: "mvn clean test org.jacoco:jacoco-maven-plugin:prepare-agent install"
+      - run: docker build -t pgnunes/sabproxy .
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
+      - run: |
+         echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
+      - run: docker push pgnunes/sabproxy:latest
+
+
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  build:
     jobs:
-      - say-hello
+      - maven
+
