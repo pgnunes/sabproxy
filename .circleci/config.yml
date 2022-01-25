@@ -30,7 +30,8 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-      - publish_image:
+      - docker/docker_login
+      - docker/publish_image:
           docker_tag: "pgnunes/sabproxy:latest"
 
 
