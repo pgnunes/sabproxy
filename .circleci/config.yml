@@ -30,7 +30,7 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-  docker/publish_image
+  - docker/publish_image
 
 
 
