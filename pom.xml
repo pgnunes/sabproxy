@@ -11,7 +11,7 @@
     
 	<groupId>com.sabproxy</groupId>
     <artifactId>sabproxy</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
 	<name>SabProxy</name>
 	<description>AdBlock Proxy</description>
 
