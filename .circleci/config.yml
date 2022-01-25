@@ -30,9 +30,9 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-  - docker/publish_image:
-      context: dockerhub
-      docker_tag: "pgnunes/sabproxy:latest"
+  docker/publish_image:
+    context: dockerhub
+    docker_tag: "pgnunes/sabproxy:latest"
 
 
 # Invoke jobs via workflows
