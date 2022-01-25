@@ -77,11 +77,8 @@ public class AdServers {
         }
 
         adServers = new ArrayList<String>();
-        LineIterator it = null;
         log.info("Loading Ad Server list from: " + adServersHostFile);
-        try {
-            it = FileUtils.lineIterator(new File(adServersHostFile), "UTF-8");
-
+        try (LineIterator it = FileUtils.lineIterator(new File(adServersHostFile), "UTF-8")) {
             while (it.hasNext()) {
                 String line = it.nextLine();
 
@@ -92,8 +89,6 @@ public class AdServers {
             log.info("Loaded " + adServers.size() + " ad servers.");
         } catch (Exception e) {
             log.error("Failed to load ad servers from file " + adServersHostFile + ". " + e.getMessage());
-        } finally {
-            LineIterator.closeQuietly(it);
         }
     }
 
